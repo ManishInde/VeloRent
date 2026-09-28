@@ -1,0 +1,23 @@
+{
+  "database": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "name": "velorent",
+    "user": "root",
+    "password": "<YOUR_MYSQL_PASSWORD>"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "threads": 8
+  },
+  "cors": {
+    "allowed_origin": "http://localhost:3000"
+  },
+  "auth": {
+    "jwt_secret": "<SET_SECURE_JWT_SECRET_IN_ENVIRONMENT>",
+    "token_ttl_seconds": 86400,
+    "max_login_attempts": 5,
+    "lockout_duration_seconds": 900
+  }
+}
