@@ -16,6 +16,7 @@ struct VehicleFilter {
     std::string statusStr = "";
     double minHealthScore = 0.0;
     std::string brand = "";
+    std::string searchTerm = "";
 };
 
 class VehicleService {

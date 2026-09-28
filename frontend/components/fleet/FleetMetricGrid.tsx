@@ -21,7 +21,7 @@ export const FleetMetricGrid: React.FC<FleetMetricGridProps> = ({
         value={isLoading || !report ? '—' : totalFleetCount ?? report.totalVehicles}
         subtitle={
           report
-            ? `${report.availableVehicles} available • ${report.rentedVehicles} rented • ${report.maintenanceVehicles} maint.`
+            ? `${report.availableVehicles} available • ${report.reservedVehicles || 0} reserved • ${report.rentedVehicles} rented • ${report.maintenanceVehicles} maint.`
             : 'Operational inventory'
         }
         icon={<Car className="w-5 h-5 text-blue-600" />}

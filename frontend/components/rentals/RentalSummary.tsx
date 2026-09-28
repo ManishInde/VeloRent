@@ -2,7 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import { Rental, Vehicle } from '@/types';
 import { RentalStatusBadge } from '@/components/ui/StatusBadge';
-import { KeyRound, Gauge, Calendar, ArrowRight, Car } from 'lucide-react';
+import { VehicleImage } from '@/components/vehicles/VehicleImage';
+import { Gauge, Calendar, ArrowRight, Car } from 'lucide-react';
+import { clsx } from 'clsx';
 
 interface RentalSummaryProps {
   rental: Rental;
@@ -11,73 +13,113 @@ interface RentalSummaryProps {
 }
 
 export const RentalSummary: React.FC<RentalSummaryProps> = ({ rental, vehicle, showDetailLink = true }) => {
+  const isActive = rental.status === 'ACTIVE';
+
   return (
-    <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:border-slate-300 transition-all">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-        <div className="flex items-start gap-3">
-          <div className="p-2.5 bg-blue-50 text-blue-600 rounded-lg shrink-0">
-            <KeyRound className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-900">Rental #{rental.id}</span>
-              <RentalStatusBadge status={rental.status} />
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">Booking Reference: #{rental.bookingId}</p>
-          </div>
-        </div>
-
-        {showDetailLink && (
-          <Link
-            href={`/customer/rentals/${rental.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors shrink-0"
-          >
-            View Details <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        )}
-      </div>
-
-      {vehicle && (
-        <div className="mt-4 flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-          <Car className="w-4 h-4 text-slate-500 shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-800 truncate">
-              {vehicle.brand} {vehicle.model}
-            </p>
-            <p className="text-[11px] text-slate-500 font-mono">
-              Reg: {vehicle.registrationNumber} • {vehicle.fuelType} • {vehicle.transmission}
-            </p>
-          </div>
-        </div>
+    <div
+      className={clsx(
+        'p-5 bg-white rounded-2xl border transition-all duration-200 overflow-hidden',
+        isActive
+          ? 'border-emerald-500/40 shadow-sm ring-1 ring-emerald-500/20 bg-gradient-to-r from-emerald-50/20 via-white to-white'
+          : 'border-slate-200/90 hover:border-slate-300 hover:shadow-sm'
       )}
+    >
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        {/* Left: Vehicle Image + Core Info */}
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <div className="w-20 h-16 sm:w-24 sm:h-18 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-200/80 shadow-2xs relative">
+            {vehicle ? (
+              <VehicleImage
+                vehicle={vehicle}
+                aspectRatio="4:3"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-slate-400">
+                <Car className="w-6 h-6 stroke-1" />
+              </div>
+            )}
+          </div>
 
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-        <div>
-          <span className="text-slate-400 font-medium block flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" /> Start Time
-          </span>
-          <span className="font-semibold text-slate-700">{rental.startDateTime || '—'}</span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Rental #{rental.id}
+              </span>
+              <RentalStatusBadge status={rental.status} />
+              {isActive && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Active On Road
+                </span>
+              )}
+            </div>
+
+            <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+              {vehicle ? `${vehicle.brand} ${vehicle.model}` : `Booking Reference #${rental.bookingId}`}
+            </h4>
+
+            {vehicle && (
+              <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                {vehicle.registrationNumber} • {vehicle.fuelType} • {vehicle.transmission}
+              </p>
+            )}
+          </div>
         </div>
-        <div>
-          <span className="text-slate-400 font-medium block flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" /> End / Return
-          </span>
-          <span className="font-semibold text-slate-700">{rental.endDateTime || 'In Progress'}</span>
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <span className="text-slate-400 font-medium block flex items-center gap-1">
-            <Gauge className="w-3.5 h-3.5" /> Odometer Reading
-          </span>
-          <span className="font-semibold text-slate-700 tabular-nums">
-            {rental.startOdometerKm.toLocaleString()} km
-            {rental.endOdometerKm > 0 ? ` $\\to$ ${rental.endOdometerKm.toLocaleString()} km` : ''}
-          </span>
-          {rental.distanceDrivenKm > 0 && (
-            <span className="text-[10px] text-emerald-600 font-bold block">
-              ({rental.distanceDrivenKm.toLocaleString()} km driven)
+
+        {/* Telemetry / Dates */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs w-full md:w-auto shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+          <div>
+            <span className="text-slate-400 font-medium block flex items-center gap-1 text-[11px]">
+              <Calendar className="w-3 h-3 text-slate-400" /> Start Time
             </span>
-          )}
+            <span className="font-semibold text-slate-800 block mt-0.5 truncate max-w-[140px]">
+              {rental.startDateTime || '—'}
+            </span>
+          </div>
+
+          <div>
+            <span className="text-slate-400 font-medium block flex items-center gap-1 text-[11px]">
+              <Calendar className="w-3 h-3 text-slate-400" /> Return
+            </span>
+            <span className="font-semibold text-slate-800 block mt-0.5 truncate max-w-[140px]">
+              {rental.endDateTime || (isActive ? 'In Progress' : '—')}
+            </span>
+          </div>
+
+          <div className="col-span-2 sm:col-span-1">
+            <span className="text-slate-400 font-medium block flex items-center gap-1 text-[11px]">
+              <Gauge className="w-3 h-3 text-slate-400" /> Odometer
+            </span>
+            <span className="font-semibold text-slate-800 tabular-nums block mt-0.5">
+              {rental.startOdometerKm.toLocaleString('en-IN')} km
+              {rental.endOdometerKm > 0 ? ` → ${rental.endOdometerKm.toLocaleString('en-IN')} km` : ''}
+            </span>
+            {rental.distanceDrivenKm > 0 && (
+              <span className="text-[10px] text-emerald-600 font-bold block">
+                +{rental.distanceDrivenKm.toLocaleString('en-IN')} km
+              </span>
+            )}
+          </div>
         </div>
+
+        {/* Action Link */}
+        {showDetailLink && (
+          <div className="shrink-0 w-full md:w-auto flex justify-end">
+            <Link
+              href={`/customer/rentals/${rental.id}`}
+              className={clsx(
+                'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all w-full md:w-auto',
+                isActive
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              )}
+            >
+              <span>{isActive ? 'Manage Rental' : 'View Summary'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

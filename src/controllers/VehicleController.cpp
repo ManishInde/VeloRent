@@ -20,7 +20,10 @@ VehicleController::VehicleController(VehicleService& vehicleService,
 void VehicleController::getVehicles(const httplib::Request& req, httplib::Response& res) {
     try {
         VehicleFilter filter;
-        if (req.has_param("search")) filter.brand = req.get_param_value("search");
+        if (req.has_param("search")) {
+            filter.searchTerm = req.get_param_value("search");
+        }
+        if (req.has_param("brand")) filter.brand = req.get_param_value("brand");
         if (req.has_param("status")) filter.statusStr = req.get_param_value("status");
         if (req.has_param("fuelType")) filter.fuelTypeStr = req.get_param_value("fuelType");
         if (req.has_param("transmission")) filter.transmissionStr = req.get_param_value("transmission");

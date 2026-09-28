@@ -215,9 +215,9 @@ std::string EnumUtils::toString(PaymentType type) {
 PaymentType EnumUtils::stringToPaymentType(const std::string& str) {
     std::string s = toUpper(str);
     if (s == "RENTAL_FEE" || s == "BASE_RENT") return PaymentType::BASE_RENT;
-    if (s == "DAMAGE_CHARGE") return PaymentType::DAMAGE_CHARGE;
+    if (s == "DAMAGE_CHARGE" || s == "DAMAGE_FEE") return PaymentType::DAMAGE_CHARGE;
     if (s == "LATE_FEE")      return PaymentType::LATE_FEE;
-    if (s == "DEPOSIT")       return PaymentType::DEPOSIT;
+    if (s == "DEPOSIT" || s == "SECURITY_DEPOSIT") return PaymentType::DEPOSIT;
     if (s == "REFUND")        return PaymentType::REFUND;
     if (s == "ADJUSTMENT")    return PaymentType::ADJUSTMENT;
     throw ValidationException("Invalid PaymentType string: " + str);

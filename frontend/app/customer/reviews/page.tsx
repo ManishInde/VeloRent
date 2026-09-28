@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
@@ -13,30 +13,42 @@ import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getCustomerReviews } from '@/lib/api/reviews';
 import { getCustomerRentals } from '@/lib/api/rentals';
-import { Review, Rental } from '@/types';
+import { getVehicles } from '@/lib/api/vehicles';
+import { Review, Rental, Vehicle } from '@/types';
 import { Star, AlertCircle, Plus } from 'lucide-react';
 
 export default function CustomerReviewsPage() {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [completedRentals, setCompletedRentals] = useState<Rental[]>([]);
+  const [vehicleMap, setVehicleMap] = useState<Map<number, Vehicle>>(new Map());
   const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const reviewedRentalIds = useMemo(() => new Set(reviews.map((r) => r.rentalId)), [reviews]);
+  const unreviewedRentals = useMemo(
+    () => completedRentals.filter((r) => !reviewedRentalIds.has(r.id)),
+    [completedRentals, reviewedRentalIds]
+  );
 
   useEffect(() => {
     let mounted = true;
     const fetchReviewData = async () => {
       if (!user) return;
       try {
-        const [revs, rts] = await Promise.all([
+        const [revs, rts, vehicles] = await Promise.all([
           getCustomerReviews(user.id).catch(() => []),
           getCustomerRentals(user.id).catch(() => []),
+          getVehicles().catch(() => []),
         ]);
         if (mounted) {
           setReviews(revs);
           setCompletedRentals(rts.filter((r) => r.status === 'COMPLETED'));
+          const map = new Map<number, Vehicle>();
+          vehicles.forEach((v) => map.set(v.id, v));
+          setVehicleMap(map);
           setIsLoading(false);
         }
       } catch (err) {
@@ -66,12 +78,12 @@ export default function CustomerReviewsPage() {
           title="My Vehicle Reviews"
           description="Rate and leave feedback on your completed vehicle rentals."
           action={
-            completedRentals.length > 0 && !showForm ? (
+            unreviewedRentals.length > 0 && !showForm ? (
               <Button
                 size="sm"
                 leftIcon={<Plus className="w-4 h-4" />}
                 onClick={() => {
-                  setSelectedRentalId(completedRentals[0].id);
+                  setSelectedRentalId(unreviewedRentals[0].id);
                   setShowForm(true);
                 }}
               >
@@ -99,11 +111,14 @@ export default function CustomerReviewsPage() {
                   onChange={(e) => setSelectedRentalId(Number(e.target.value))}
                   className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none"
                 >
-                  {completedRentals.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      Rental #{r.id} ({r.startDateTime || 'Completed'})
-                    </option>
-                  ))}
+                  {completedRentals.map((r) => {
+                    const isReviewed = reviewedRentalIds.has(r.id);
+                    return (
+                      <option key={r.id} value={r.id} disabled={isReviewed}>
+                        Rental #{r.id} ({r.startDateTime || 'Completed'}){isReviewed ? ' — Already Reviewed' : ''}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}
@@ -125,7 +140,11 @@ export default function CustomerReviewsPage() {
         ) : reviews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {reviews.map((rev) => (
-              <ReviewCard key={rev.id} review={rev} />
+              <ReviewCard
+                key={rev.id}
+                review={rev}
+                vehicle={vehicleMap.get(rev.vehicleId)}
+              />
             ))}
           </div>
         ) : (
@@ -134,12 +153,12 @@ export default function CustomerReviewsPage() {
             title="No reviews submitted yet."
             description="After completing a vehicle rental, you can rate and submit feedback for the fleet."
             action={
-              completedRentals.length > 0 ? (
+              unreviewedRentals.length > 0 ? (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => {
-                    setSelectedRentalId(completedRentals[0].id);
+                    setSelectedRentalId(unreviewedRentals[0].id);
                     setShowForm(true);
                   }}
                 >

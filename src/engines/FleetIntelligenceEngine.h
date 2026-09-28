@@ -26,6 +26,7 @@ struct FleetInsight {
 struct FleetAnalyticsReport {
     int totalVehicles = 0;
     int availableVehicles = 0;
+    int reservedVehicles = 0;
     int rentedVehicles = 0;
     int maintenanceVehicles = 0;
     double fleetUtilizationPct = 0.0;

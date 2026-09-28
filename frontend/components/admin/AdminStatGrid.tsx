@@ -16,7 +16,7 @@ export const AdminStatGrid: React.FC<AdminStatGridProps> = ({ report, isLoading 
         value={isLoading || !report ? '—' : report.totalVehicles}
         subtitle={
           report
-            ? `${report.availableVehicles} available • ${report.rentedVehicles} rented • ${report.maintenanceVehicles} maint.`
+            ? `${report.availableVehicles} available • ${report.reservedVehicles || 0} reserved • ${report.rentedVehicles} rented • ${report.maintenanceVehicles} maint.`
             : 'Fleet breakdown'
         }
         icon={<Car className="w-5 h-5 text-blue-600" />}

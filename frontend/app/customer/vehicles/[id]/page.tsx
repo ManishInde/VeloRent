@@ -17,6 +17,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Modal } from '@/components/ui/Modal';
 import { PricingBreakdown } from '@/components/pricing/PricingBreakdown';
 import { RecommendationCard } from '@/components/recommendations/RecommendationCard';
+import { VehicleImage } from '@/components/vehicles/VehicleImage';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useToast } from '@/components/ui/Toast';
 import { getVehicleById, getVehicleReviews } from '@/lib/api/vehicles';
@@ -26,7 +27,7 @@ import { getRecommendations } from '@/lib/api/recommendations';
 import { Vehicle, Review, PricingQuote, Recommendation, LoyaltyAccount, ApiResponse } from '@/types';
 import { apiClient } from '@/lib/api/client';
 import {
-  Car, Fuel, Gauge, Users, Calendar, ShieldCheck, Star,
+  Fuel, Gauge, Users, Calendar, ShieldCheck, Star,
   MapPin, ArrowLeft, CheckCircle2, AlertTriangle, Sparkles
 } from 'lucide-react';
 
@@ -212,49 +213,106 @@ export default function VehicleDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column — Vehicle Info */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Hero + Overview */}
-            <Card>
-              <div className="relative h-56 sm:h-72 bg-gradient-to-br from-slate-900 to-slate-800 rounded-t-xl flex items-center justify-center overflow-hidden">
-                <Car className="w-24 h-24 text-slate-700 stroke-[0.5]" />
-                <div className="absolute top-4 left-4"><VehicleStatusBadge status={vehicle.status} /></div>
-                <div className="absolute top-4 right-4 bg-slate-950/70 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-md border border-slate-700/50 uppercase tracking-wider">
-                  {vehicle.type}
+            {/* Premium Vehicle Hero Showcase */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div className="relative h-64 sm:h-80 md:h-96 w-full bg-slate-950 overflow-hidden">
+                <VehicleImage
+                  vehicle={vehicle}
+                  aspectRatio="16:9"
+                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  priority={true}
+                />
+                {/* Subtle dark vignette overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40 pointer-events-none" />
+
+                {/* Top Floating Badges */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <VehicleStatusBadge status={vehicle.status} />
+                  <span className="bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-700/60 uppercase tracking-wider">
+                    {vehicle.type}
+                  </span>
                 </div>
-                {avgRating && (
-                  <div className="absolute bottom-4 right-4 bg-slate-950/80 backdrop-blur-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-white text-xs border border-slate-800">
-                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                    <span className="font-bold">{avgRating}</span>
-                    <span className="text-slate-400">({reviews.length})</span>
+
+                {/* Top Right: Health Score Pill */}
+                <div className="absolute top-4 right-4">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-slate-800 text-xs text-white shadow-md">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        vehicle.healthScore >= 85
+                          ? 'bg-emerald-400 animate-pulse'
+                          : vehicle.healthScore >= 60
+                          ? 'bg-amber-400'
+                          : 'bg-rose-400'
+                      }`}
+                    />
+                    <span className="font-bold">{vehicle.healthScore}</span>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Health</span>
                   </div>
-                )}
-              </div>
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-4">
+                </div>
+
+                {/* Bottom Left: Title & Model */}
+                <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900 tracking-tight">{vehicle.brand} {vehicle.model}</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">{vehicle.registrationNumber} — Purchased {vehicle.purchaseYear}</p>
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight drop-shadow-md">
+                      {vehicle.brand} {vehicle.model}
+                    </h1>
+                    <p className="text-xs text-slate-300 font-medium drop-shadow-xs mt-0.5">
+                      {vehicle.registrationNumber} • Model Year {vehicle.purchaseYear}
+                    </p>
                   </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-extrabold text-slate-900 tabular-nums">{formatINR(vehicle.baseRentalRate)}</span>
-                    <span className="text-xs text-slate-500"> /day</span>
+
+                  {avgRating && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-md border border-slate-700/60 text-xs self-start sm:self-auto">
+                      <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                      <span className="font-bold">{avgRating}</span>
+                      <span className="text-slate-400">({reviews.length} reviews)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Specifications Strip & Base Price */}
+              <div className="p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-100 gap-4">
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Standard Daily Rental
+                    </span>
+                    <div className="flex items-baseline gap-1 mt-0.5">
+                      <span className="text-3xl font-extrabold text-slate-900 tabular-nums">
+                        {formatINR(vehicle.baseRentalRate)}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-500">/ 24 hrs</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 text-xs font-semibold">
+                      <ShieldCheck className="w-4 h-4 text-blue-600" /> Verified Fleet Unit
+                    </span>
                   </div>
                 </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { icon: <Fuel className="w-4 h-4" />, label: 'Fuel', value: vehicle.fuelType },
+                    { icon: <Fuel className="w-4 h-4" />, label: 'Fuel Type', value: vehicle.fuelType },
                     { icon: <Gauge className="w-4 h-4" />, label: 'Transmission', value: vehicle.transmission },
-                    { icon: <Users className="w-4 h-4" />, label: 'Seats', value: String(vehicle.seats) },
+                    { icon: <Users className="w-4 h-4" />, label: 'Seating Capacity', value: `${vehicle.seats} Seats` },
                     { icon: <MapPin className="w-4 h-4" />, label: 'Odometer', value: `${vehicle.odometerKm.toLocaleString('en-IN')} km` },
                   ].map((spec) => (
-                    <div key={spec.label} className="flex flex-col items-center p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                      <div className="text-slate-400 mb-1">{spec.icon}</div>
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">{spec.label}</span>
-                      <span className="text-xs font-semibold text-slate-900 mt-0.5">{spec.value}</span>
+                    <div
+                      key={spec.label}
+                      className="flex flex-col items-center justify-center p-3.5 bg-slate-50/80 rounded-xl border border-slate-100 text-center"
+                    >
+                      <div className="text-blue-600 mb-1.5">{spec.icon}</div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                        {spec.label}
+                      </span>
+                      <span className="text-xs font-bold text-slate-900 mt-0.5">{spec.value}</span>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Health Score */}
             {vehicle.healthScore > 0 && (

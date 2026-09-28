@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { RentalStatusBadge } from '@/components/ui/StatusBadge';
 import { PaymentModal } from '@/components/payments/PaymentModal';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { VehicleImage } from '@/components/vehicles/VehicleImage';
 import { getRentalById, returnRental } from '@/lib/api/rentals';
 import { getBookingById } from '@/lib/api/bookings';
 import { getVehicleById } from '@/lib/api/vehicles';
@@ -237,31 +238,45 @@ export default function CustomerRentalDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Car className="w-4 h-4 text-blue-600" /> Vehicle Information
+                      <Car className="w-4 h-4 text-blue-600" /> Allocated Vehicle Information
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="px-5 pb-5 pt-0">
                     {vehicle ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
-                        <div>
-                          <span className="text-slate-400">Brand & Model</span>
-                          <p className="font-bold text-slate-900">{vehicle.brand} {vehicle.model}</p>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className="w-full sm:w-36 h-24 rounded-xl overflow-hidden bg-slate-950 shrink-0 border border-slate-200/80 shadow-2xs relative">
+                          <VehicleImage
+                            vehicle={vehicle}
+                            aspectRatio="16:9"
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div>
-                          <span className="text-slate-400">Registration</span>
-                          <p className="font-semibold text-slate-800 font-mono">{vehicle.registrationNumber}</p>
-                        </div>
-                        <div>
-                          <span className="text-slate-400">Type</span>
-                          <p className="font-semibold text-slate-800">{vehicle.type} ({vehicle.fuelType})</p>
-                        </div>
-                        <div>
-                          <span className="text-slate-400">Transmission</span>
-                          <p className="font-semibold text-slate-800">{vehicle.transmission}</p>
-                        </div>
-                        <div>
-                          <span className="text-slate-400">Base Rate</span>
-                          <p className="font-bold text-slate-900">₹{vehicle.baseRentalRate}/day</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-base font-bold text-slate-900">
+                              {vehicle.brand} {vehicle.model}
+                            </h4>
+                            <span className="text-[11px] font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md border border-blue-100">
+                              {vehicle.type}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            Reg: <span className="font-mono font-semibold text-slate-700">{vehicle.registrationNumber}</span> — Booking #{rental.bookingId}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-medium rounded-md">
+                              {vehicle.fuelType}
+                            </span>
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-medium rounded-md">
+                              {vehicle.transmission}
+                            </span>
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-medium rounded-md">
+                              {vehicle.seats} Seats
+                            </span>
+                            <span className="font-extrabold text-slate-900 ml-auto">
+                              ₹{vehicle.baseRentalRate.toLocaleString('en-IN')}/day
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ) : (

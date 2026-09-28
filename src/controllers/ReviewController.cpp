@@ -16,8 +16,9 @@ void ReviewController::submitReview(const httplib::Request& req, httplib::Respon
         int rentalId = body.at("rentalId").get<int>();
         int rating = body.at("rating").get<int>();
         std::string comment = body.value("comment", "");
+        int vehicleId = body.value("vehicleId", 0);
 
-        Review rev(0, rentalId, auth.userId, 0, rating, comment);
+        Review rev(0, rentalId, auth.userId, vehicleId, rating, comment);
         int newId = reviewService.submitReview(rev);
         Review review = reviewService.getReviewById(newId);
         HttpResponse::success(res, JsonUtils::toJson(review), 201);

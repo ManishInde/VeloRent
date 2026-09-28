@@ -50,7 +50,7 @@ void runCoreRentalWorkflow() {
     BookingService bookingService(bookingRepo, customerRepo, vehicleRepo);
     RentalService rentalService(rentalRepo, bookingRepo, vehicleRepo);
     PaymentService paymentService(paymentRepo, rentalRepo);
-    ReviewService reviewService(reviewRepo, rentalRepo);
+    ReviewService reviewService(reviewRepo, rentalRepo, bookingRepo, &vehicleRepo);
     NotificationService notificationService(notifRepo);
 
     // STEP 1: CUSTOMER REGISTRATION

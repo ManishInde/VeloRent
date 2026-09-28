@@ -11,12 +11,16 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { RentalSummary } from '@/components/rentals/RentalSummary';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getCustomerRentals } from '@/lib/api/rentals';
-import { Rental, RentalStatus } from '@/types';
+import { getMyBookings } from '@/lib/api/bookings';
+import { getVehicles } from '@/lib/api/vehicles';
+import { Rental, RentalStatus, Vehicle, Booking } from '@/types';
 import { KeyRound, Car, AlertCircle } from 'lucide-react';
 
 export default function CustomerRentalsPage() {
   const { user } = useAuth();
   const [rentals, setRentals] = useState<Rental[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [filter, setFilter] = useState<RentalStatus | 'ALL'>('ALL');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +32,15 @@ export default function CustomerRentalsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const rentalData = await getCustomerRentals(user.id);
+        const [rentalData, bookingData, vehicleData] = await Promise.all([
+          getCustomerRentals(user.id),
+          getMyBookings(user.id).catch(() => []),
+          getVehicles().catch(() => []),
+        ]);
         if (!mounted) return;
         setRentals(rentalData);
+        setBookings(bookingData);
+        setVehicles(vehicleData);
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : 'Failed to load rentals.');
       } finally {
@@ -43,6 +53,12 @@ export default function CustomerRentalsPage() {
       mounted = false;
     };
   }, [user]);
+
+  const getVehicleForRental = (rental: Rental): Vehicle | undefined => {
+    const booking = bookings.find((b) => b.id === rental.bookingId);
+    if (!booking) return undefined;
+    return vehicles.find((v) => v.id === booking.vehicleId);
+  };
 
   const filteredRentals = rentals.filter((r) => {
     if (filter === 'ALL') return true;
@@ -102,7 +118,11 @@ export default function CustomerRentalsPage() {
         ) : filteredRentals.length > 0 ? (
           <div className="space-y-4">
             {filteredRentals.map((rental) => (
-              <RentalSummary key={rental.id} rental={rental} />
+              <RentalSummary
+                key={rental.id}
+                rental={rental}
+                vehicle={getVehicleForRental(rental)}
+              />
             ))}
           </div>
         ) : (

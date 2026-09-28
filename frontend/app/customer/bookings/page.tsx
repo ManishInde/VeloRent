@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/Button';
 import { BookingCard } from '@/components/bookings/BookingCard';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getMyBookings } from '@/lib/api/bookings';
-import { Booking, BookingStatus } from '@/types';
+import { getVehicles } from '@/lib/api/vehicles';
+import { Booking, BookingStatus, Vehicle } from '@/types';
 import { Calendar, Car } from 'lucide-react';
 import Link from 'next/link';
 import { clsx } from 'clsx';
@@ -21,6 +22,7 @@ type Tab = 'ALL' | BookingStatus;
 export default function MyBookingsPage() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [vehicleMap, setVehicleMap] = useState<Map<number, Vehicle>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('ALL');
@@ -32,8 +34,16 @@ export default function MyBookingsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getMyBookings(user.id);
-        if (mounted) setBookings(data.sort((a, b) => b.id - a.id));
+        const [data, vehicles] = await Promise.all([
+          getMyBookings(user.id),
+          getVehicles().catch(() => []),
+        ]);
+        if (mounted) {
+          setBookings(data.sort((a, b) => b.id - a.id));
+          const map = new Map<number, Vehicle>();
+          vehicles.forEach((v) => map.set(v.id, v));
+          setVehicleMap(map);
+        }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : 'Failed to load bookings.');
       } finally {
@@ -113,7 +123,7 @@ export default function MyBookingsPage() {
         ) : (
           <div className="space-y-3">
             {filtered.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
+              <BookingCard key={booking.id} booking={booking} vehicleMap={vehicleMap} />
             ))}
           </div>
         )}

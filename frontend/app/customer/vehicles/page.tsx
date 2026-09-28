@@ -21,12 +21,16 @@ function VehicleMarketplaceContent() {
   const [error, setError] = useState<string | null>(null);
 
   // Initialize filters from URL query params
-  const [filters, setFilters] = useState<VehicleFilterParams>(() => ({
-    search: searchParams.get('search') || '',
-    fuelType: (searchParams.get('fuelType') as VehicleFilterParams['fuelType']) || '',
-    transmission: (searchParams.get('transmission') as VehicleFilterParams['transmission']) || '',
-    status: (searchParams.get('status') as VehicleFilterParams['status']) || '',
-  }));
+  const [filters, setFilters] = useState<VehicleFilterParams>(() => {
+    const cat = searchParams.get('categoryId');
+    return {
+      search: searchParams.get('search') || '',
+      fuelType: (searchParams.get('fuelType') as VehicleFilterParams['fuelType']) || '',
+      transmission: (searchParams.get('transmission') as VehicleFilterParams['transmission']) || '',
+      status: (searchParams.get('status') as VehicleFilterParams['status']) || '',
+      categoryId: cat ? Number(cat) : undefined,
+    };
+  });
   const [sortBy, setSortBy] = useState<SortOption>(
     (searchParams.get('sort') as SortOption) || 'price_asc'
   );
@@ -38,6 +42,7 @@ function VehicleMarketplaceContent() {
     if (f.fuelType) params.set('fuelType', f.fuelType);
     if (f.transmission) params.set('transmission', f.transmission);
     if (f.status) params.set('status', f.status);
+    if (f.categoryId !== undefined) params.set('categoryId', String(f.categoryId));
     if (s !== 'price_asc') params.set('sort', s);
     const qs = params.toString();
     router.replace(`/customer/vehicles${qs ? `?${qs}` : ''}`, { scroll: false });
@@ -56,6 +61,7 @@ function VehicleMarketplaceContent() {
         if (filters.fuelType) serverFilters.fuelType = filters.fuelType;
         if (filters.transmission) serverFilters.transmission = filters.transmission;
         if (filters.status) serverFilters.status = filters.status;
+        if (filters.categoryId !== undefined) serverFilters.categoryId = filters.categoryId;
 
         const data = await getVehicles(serverFilters);
         if (isMounted) {
@@ -98,7 +104,7 @@ function VehicleMarketplaceContent() {
   }, [vehicles, sortBy]);
 
   const handleReset = () => {
-    setFilters({ search: '', fuelType: '', transmission: '', status: '' });
+    setFilters({ search: '', fuelType: '', transmission: '', status: '', categoryId: undefined });
     setSortBy('price_asc');
   };
 
@@ -132,8 +138,8 @@ export default function VehiclesPage() {
     <ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN', 'FLEET_MANAGER']}>
       <AppShell>
         <PageHeader
-          title="Find your next vehicle"
-          description="Browse our entire fleet with real-time availability, dynamic pricing, and intelligent health indicators."
+          title="Browse Vehicles"
+          description="Find a vehicle that fits your journey."
           breadcrumbs={[
             { label: 'Dashboard', href: '/customer' },
             { label: 'Vehicles' },

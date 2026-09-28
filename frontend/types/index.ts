@@ -307,6 +307,7 @@ export interface FleetInsight {
 export interface FleetAnalyticsReport {
   totalVehicles: number;
   availableVehicles: number;
+  reservedVehicles: number;
   rentedVehicles: number;
   maintenanceVehicles: number;
   fleetUtilizationPct: number;

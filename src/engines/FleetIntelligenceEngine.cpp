@@ -24,6 +24,7 @@ FleetAnalyticsReport FleetIntelligenceEngine::generateReport(
 
         switch (v->getStatus()) {
             case VehicleStatus::AVAILABLE:   report.availableVehicles++; break;
+            case VehicleStatus::RESERVED:    report.reservedVehicles++; break;
             case VehicleStatus::RENTED:      report.rentedVehicles++; break;
             case VehicleStatus::MAINTENANCE: report.maintenanceVehicles++; break;
             default: break;

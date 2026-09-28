@@ -230,7 +230,7 @@ int main() {
         RentalService rentalService(rentalRepo, bookingRepo, vehicleRepo);
         PaymentService paymentService(paymentRepo, rentalRepo);
         MaintenanceService maintenanceService(maintenanceRepo, vehicleRepo);
-        ReviewService reviewService(reviewRepo, rentalRepo);
+        ReviewService reviewService(reviewRepo, rentalRepo, bookingRepo, &vehicleRepo);
         LoyaltyService loyaltyService(loyaltyRepo);
         NotificationService notificationService(notificationRepo);
 

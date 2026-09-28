@@ -38,6 +38,8 @@ public:
 
     void setRating(int r);
     void setComment(const std::string& c) { comment = c; }
+    void setVehicleId(int vId) { vehicleId = vId; }
+    void setCustomerId(int cId) { customerId = cId; }
 };
 
 } // namespace velorent

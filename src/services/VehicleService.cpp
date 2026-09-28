@@ -31,6 +31,14 @@ std::vector<std::shared_ptr<Vehicle>> VehicleService::getAvailableVehicles() {
     return vehicleRepo.findAvailable();
 }
 
+#include <cctype>
+
+static std::string toLowerString(const std::string& str) {
+    std::string lower = str;
+    std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return std::tolower(c); });
+    return lower;
+}
+
 std::vector<std::shared_ptr<Vehicle>> VehicleService::searchVehicles(const VehicleFilter& filter) {
     Logger::info("VehicleService: Executing vehicle search filter.");
     auto all = vehicleRepo.findAll();
@@ -38,7 +46,6 @@ std::vector<std::shared_ptr<Vehicle>> VehicleService::searchVehicles(const Vehic
 
     for (const auto& v : all) {
         if (filter.categoryId != 0 && v->getCategoryId() != filter.categoryId) continue;
-        if (!filter.brand.empty() && v->getBrand().find(filter.brand) == std::string::npos) continue;
         if (!filter.fuelTypeStr.empty() && EnumUtils::toString(v->getFuelType()) != filter.fuelTypeStr) continue;
         if (!filter.transmissionStr.empty() && EnumUtils::toString(v->getTransmission()) != filter.transmissionStr) continue;
         if (filter.minSeats > 0 && v->getSeats() < filter.minSeats) continue;
@@ -46,6 +53,27 @@ std::vector<std::shared_ptr<Vehicle>> VehicleService::searchVehicles(const Vehic
         if (filter.maxPrice > 0.0 && v->getBaseRentalRate() > filter.maxPrice) continue;
         if (!filter.statusStr.empty() && EnumUtils::toString(v->getStatus()) != filter.statusStr) continue;
         if (filter.minHealthScore > 0.0 && v->getHealthScore() < filter.minHealthScore) continue;
+
+        if (!filter.brand.empty()) {
+            std::string vBrand = toLowerString(v->getBrand());
+            std::string qBrand = toLowerString(filter.brand);
+            if (vBrand.find(qBrand) == std::string::npos) continue;
+        }
+
+        if (!filter.searchTerm.empty()) {
+            std::string query = toLowerString(filter.searchTerm);
+            std::string brand = toLowerString(v->getBrand());
+            std::string model = toLowerString(v->getModel());
+            std::string fullName = brand + " " + model;
+            std::string reg = toLowerString(v->getRegistrationNumber());
+
+            bool match = (brand.find(query) != std::string::npos) ||
+                         (model.find(query) != std::string::npos) ||
+                         (fullName.find(query) != std::string::npos) ||
+                         (reg.find(query) != std::string::npos);
+
+            if (!match) continue;
+        }
 
         result.push_back(v);
     }

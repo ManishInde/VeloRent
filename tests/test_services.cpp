@@ -23,6 +23,9 @@
 #include "ValidationException.h"
 #include "InvalidBookingException.h"
 #include "RentalNotActiveException.h"
+#include "BusinessRuleException.h"
+#include "ForbiddenException.h"
+#include "NotFoundException.h"
 #include "PaymentException.h"
 #include "BusinessRuleException.h"
 #include "NotFoundException.h"
@@ -48,6 +51,27 @@ void testVehicleService(DatabaseManager& db) {
     filter.brand = "Maruti";
     auto searchRes = vService.searchVehicles(filter);
     assert(!searchRes.empty());
+
+    // Test case-insensitive search by model (Creta)
+    VehicleFilter cretaFilter;
+    cretaFilter.searchTerm = "Creta";
+    auto cretaRes = vService.searchVehicles(cretaFilter);
+    assert(!cretaRes.empty());
+    assert(cretaRes[0]->getModel() == "Creta");
+
+    // Test case-insensitive lowercase search by model (swift)
+    VehicleFilter swiftFilter;
+    swiftFilter.searchTerm = "swift";
+    auto swiftRes = vService.searchVehicles(swiftFilter);
+    assert(!swiftRes.empty());
+    assert(swiftRes[0]->getModel() == "Swift");
+
+    // Test search by full name (Honda City)
+    VehicleFilter cityFilter;
+    cityFilter.searchTerm = "Honda City";
+    auto cityRes = vService.searchVehicles(cityFilter);
+    assert(!cityRes.empty());
+    assert(cityRes[0]->getModel() == "City");
 
     // Test validation
     try {
@@ -166,14 +190,44 @@ void testReviewService(DatabaseManager& db) {
     std::cout << "  [7/9] Testing ReviewService...\n";
     ReviewRepository revRepo(db);
     RentalRepository rRepo(db);
-    ReviewService revService(revRepo, rRepo);
+    BookingRepository bRepo(db);
+    VehicleRepository vRepo(db);
+    ReviewService revService(revRepo, rRepo, bRepo, &vRepo);
 
-    // Test invalid rating
+    // 1. Test invalid rating (< 1 or > 5)
     try {
         Review r(0, 1, 7, 1, 10, "Great", "");
         revService.submitReview(r);
-        assert(false && "Should have thrown ValidationException");
+        assert(false && "Should have thrown ValidationException for rating > 5");
     } catch (const ValidationException&) {
+        // Expected
+    }
+
+    // 2. Test duplicate review for already reviewed rental (Rental 1 already has Review 1 in seed)
+    try {
+        Review r(0, 1, 7, 11, 5, "Duplicate review test", "");
+        revService.submitReview(r);
+        assert(false && "Should have thrown BusinessRuleException for duplicate review");
+    } catch (const BusinessRuleException&) {
+        // Expected
+    }
+
+    // 3. Test review for non-existent rental
+    try {
+        Review r(0, 999999, 7, 1, 5, "Non-existent rental test", "");
+        revService.submitReview(r);
+        assert(false && "Should have thrown NotFoundException for non-existent rental");
+    } catch (const NotFoundException&) {
+        // Expected
+    }
+
+    // 4. Test review for rental belonging to another customer
+    // Rental 7 in seed belongs to Customer 8 and is not yet reviewed. Submitting as Customer 7 should fail.
+    try {
+        Review r(0, 7, 7, 1, 5, "Unauthorized review test", "");
+        revService.submitReview(r);
+        assert(false && "Should have thrown ForbiddenException for unauthorized customer");
+    } catch (const ForbiddenException&) {
         // Expected
     }
 
