@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoyaltyAccount, LoyaltyTier } from '@/types';
-import { Award, Zap, ShieldCheck } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Zap, ShieldCheck } from 'lucide-react';
 
 interface LoyaltySummaryProps {
   loyalty: LoyaltyAccount;
@@ -28,69 +29,95 @@ export const LoyaltySummary: React.FC<LoyaltySummaryProps> = ({ loyalty, onOpenR
   const pointsNeeded = nextTier ? Math.max(0, threshold - loyalty.totalPointsEarned) : 0;
 
   return (
-    <div className="p-6 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-xl">
-            <Award className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-base font-bold tracking-tight">VeloRent Rewards</h3>
-            <p className="text-xs text-slate-400">Backend Authoritative Points</p>
-          </div>
-        </div>
-        <span className="px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30">
-          {loyalty.tier}
-        </span>
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+    <div className="bg-[#111111] text-[#F4F1EA] border-2 border-[#111111] shadow-[6px_6px_0px_#7657FF] p-6 sm:p-8 relative overflow-hidden font-mono">
+      {/* Top Header of Pass */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#2E2E2A] gap-4">
         <div>
-          <span className="text-xs text-slate-400 uppercase tracking-wide block">Current Balance</span>
-          <span className="text-3xl font-extrabold text-amber-400 tabular-nums">
-            {loyalty.currentPoints.toLocaleString()}
-          </span>
-          <span className="text-[10px] text-slate-400 block mt-0.5">Available for redemption</span>
-        </div>
-        <div>
-          <span className="text-xs text-slate-400 uppercase tracking-wide block">Lifetime Earned</span>
-          <span className="text-2xl font-bold text-slate-200 tabular-nums">
-            {loyalty.totalPointsEarned.toLocaleString()}
-          </span>
-          <span className="text-[10px] text-slate-400 block mt-0.5">Total accrued points</span>
-        </div>
-      </div>
-
-      {nextTier && (
-        <div className="mt-6 pt-4 border-t border-slate-800">
-          <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-slate-400 flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-amber-400" /> Progress to {nextTier}
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-[#C7F000]" />
+            <span className="micro-tag text-white tracking-[0.25em]">
+              VELORENT AUTOMOTIVE CLUB
             </span>
-            <span className="text-amber-300 font-semibold">{pointsNeeded} pts to go</span>
           </div>
-          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-linear-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
+          <h2 className="font-display text-2xl font-black uppercase text-white mt-1">
+            MEMBERSHIP PASS
+          </h2>
         </div>
-      )}
 
-      {onOpenRedeem && (
-        <div className="mt-6 pt-4 border-t border-slate-800 flex justify-end">
-          <button
+        <div className="text-left sm:text-right">
+          <span className="text-[10px] text-[#888880] uppercase block">STATUS PASS</span>
+          <span className="font-display text-sm font-black bg-[#C7F000] text-[#111111] px-2.5 py-0.5 uppercase tracking-wider inline-block mt-0.5">
+            {loyalty.tier} MEMBER
+          </span>
+        </div>
+      </div>
+
+      {/* Main Points & Tier Display */}
+      <div className="py-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+        <div>
+          <span className="micro-tag text-[#888880] block mb-1">CURRENT REWARD BALANCE</span>
+          <div className="flex items-baseline gap-2">
+            <span className="editorial-display text-5xl sm:text-6xl text-[#C7F000]">
+              {loyalty.currentPoints.toLocaleString()}
+            </span>
+            <span className="font-display font-bold text-sm text-[#AAA8A0]">POINTS</span>
+          </div>
+          <span className="text-[11px] text-[#888880] mt-1 block">
+            LIFETIME ACCRUED: {loyalty.totalPointsEarned.toLocaleString()} PTS
+          </span>
+        </div>
+
+        {nextTier ? (
+          <div className="p-4 bg-[#1C1C1A] border border-[#2E2E2A]">
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="text-[#AAA8A0] uppercase font-bold flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-[#C7F000]" /> NEXT TIER: {nextTier}
+              </span>
+              <span className="text-[#C7F000] font-bold">{pointsNeeded} PTS TO UNLOCK</span>
+            </div>
+
+            <div className="w-full h-2.5 bg-[#111111] border border-[#2E2E2A] overflow-hidden">
+              <div
+                className="h-full bg-[#C7F000] transition-all duration-500"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-[#888880] mt-2 block">
+              Earn {threshold} lifetime points to elevate to {nextTier} status.
+            </span>
+          </div>
+        ) : (
+          <div className="p-4 bg-[#1C1C1A] border border-[#2E2E2A]">
+            <span className="text-xs text-[#C7F000] font-bold uppercase block">
+              MAXIMUM TIER ACHIEVED
+            </span>
+            <span className="text-[11px] text-[#AAA8A0] mt-1 block">
+              You possess top-tier Platinum automotive privileges including maximum 15% discount.
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Pass Footer & Redeem Action */}
+      <div className="pt-5 border-t border-[#2E2E2A] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 text-[11px] text-[#888880] uppercase">
+          <span>SERIAL: VR-PASS-{loyalty.customerId}-2026</span>
+          <span>•</span>
+          <span className="text-[#AAA8A0]">VERIFIED DRIVER</span>
+        </div>
+
+        {onOpenRedeem && (
+          <Button
+            size="sm"
+            variant="primary"
             onClick={onOpenRedeem}
             disabled={loyalty.currentPoints <= 0}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            leftIcon={<ShieldCheck className="w-4 h-4" />}
           >
-            <ShieldCheck className="w-4 h-4" /> Redeem Points
-          </button>
-        </div>
-      )}
+            REDEEM REWARDS
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

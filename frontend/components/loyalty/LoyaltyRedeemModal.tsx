@@ -63,60 +63,65 @@ export const LoyaltyRedeemModal: React.FC<LoyaltyRedeemModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 bg-[#111111]/70 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-[#FFFFFF] border-2 border-[#111111] max-w-md w-full p-6 sm:p-7 shadow-[6px_6px_0px_#111111] relative font-mono text-xs">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg focus:outline-none"
+          className="absolute top-4 right-4 p-1.5 text-[#888880] hover:text-[#111111] cursor-pointer"
+          aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
-            <Award className="w-6 h-6" />
+        <div className="flex items-center gap-3 pb-4 border-b border-[#111111]/15">
+          <div className="w-9 h-9 bg-[#C7F000] text-[#111111] border border-[#111111] flex items-center justify-center shrink-0">
+            <Award className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900">Redeem Loyalty Points</h3>
-            <p className="text-xs text-slate-500">Backend Authoritative Redemption</p>
+            <span className="micro-tag text-[#777770]">AUTOMOTIVE CLUB PRIVILEGES</span>
+            <h3 className="font-display font-black text-base uppercase text-[#111111] mt-0.5">
+              REDEEM REWARD POINTS
+            </h3>
           </div>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg flex items-center gap-2">
+          <div className="mt-4 p-3 bg-[#FFF0ED] border border-[#FF654A] text-[#C4381F] text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
-            <span className="text-slate-600 font-medium">Available Points Balance:</span>
-            <span className="font-extrabold text-amber-600 tabular-nums">{currentPoints} pts</span>
+          <div className="p-3 bg-[#FAF8F5] border border-[#111111]/15 flex items-center justify-between text-xs font-mono">
+            <span className="text-[#666660]">AVAILABLE BALANCE:</span>
+            <span className="font-bold text-[#111111] bg-[#C7F000] px-1.5 py-0.5 border border-[#111111]">{currentPoints} PTS</span>
           </div>
 
           <Input
-            label="Points to Redeem"
+            label="POINTS TO REDEEM"
             type="number"
             min={1}
             max={currentPoints}
             value={pointsToRedeem}
             onChange={(e) => setPointsToRedeem(e.target.value)}
             helperText="Backend LoyaltyEngine validates redemption eligibility."
+            className="font-mono text-xs"
           />
 
           <Input
-            label="Rental Subtotal (₹)"
+            label="RENTAL SUBTOTAL (₹)"
             type="number"
             min={1}
             value={subtotal}
             onChange={(e) => setSubtotal(e.target.value)}
             helperText="Rental amount to apply points discount against."
+            className="font-mono text-xs"
           />
 
           <div className="flex items-center justify-end gap-3 pt-3">
             <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isProcessing}>
-              Cancel
+              CANCEL
             </Button>
             <Button
               type="submit"
@@ -124,7 +129,7 @@ export const LoyaltyRedeemModal: React.FC<LoyaltyRedeemModalProps> = ({
               isLoading={isProcessing}
               leftIcon={<CheckCircle2 className="w-4 h-4" />}
             >
-              Submit Redemption
+              CONFIRM REDEMPTION
             </Button>
           </div>
         </form>

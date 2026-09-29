@@ -18,6 +18,8 @@ public:
     void submitReview(const httplib::Request& req, httplib::Response& res);
     void getVehicleReviews(const httplib::Request& req, httplib::Response& res);
     void getCustomerReviews(const httplib::Request& req, httplib::Response& res);
+    void getAllReviews(const httplib::Request& req, httplib::Response& res);
+    void getRentalReview(const httplib::Request& req, httplib::Response& res);
 };
 
 } // namespace velorent

@@ -1,14 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Grotesk, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { ToastProvider } from '@/components/ui/Toast';
 
-const inter = Inter({ subsets: ['latin'] });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'VeloRent — Intelligent Vehicle Rental & Fleet Management System',
-  description: 'Enterprise vehicle rental, dynamic pricing, and intelligent fleet management platform.',
+  title: 'VeloRent — Automotive Editorial & Fleet Marketplace',
+  description: 'Editorial vehicle rental, dynamic pricing, and intelligent automotive marketplace.',
 };
 
 export default function RootLayout({
@@ -17,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-full flex flex-col bg-slate-50 text-slate-900`}>
+    <html lang="en" className={`h-full ${spaceGrotesk.variable} ${inter.variable}`}>
+      <body className="min-h-full flex flex-col bg-[#F4F1EA] text-[#111111] font-sans antialiased selection:bg-[#C7F000] selection:text-[#111111]">
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthProvider>

@@ -9,10 +9,12 @@ FleetController::FleetController(FleetIntelligenceEngine& fleetEngine,
                                  RentalRepository& rentalRepo,
                                  PaymentRepository& paymentRepo,
                                  MaintenanceRepository& maintenanceRepo,
-                                 AuthMiddleware& authMiddleware)
+                                 AuthMiddleware& authMiddleware,
+                                 BookingRepository* bookingRepo)
     : fleetEngine(fleetEngine), vehicleRepo(vehicleRepo),
       rentalRepo(rentalRepo), paymentRepo(paymentRepo),
-      maintenanceRepo(maintenanceRepo), authMiddleware(authMiddleware) {}
+      maintenanceRepo(maintenanceRepo), authMiddleware(authMiddleware),
+      bookingRepo(bookingRepo) {}
 
 void FleetController::getFleetAnalytics(const httplib::Request& req, httplib::Response& res) {
     try {
@@ -21,10 +23,14 @@ void FleetController::getFleetAnalytics(const httplib::Request& req, httplib::Re
 
         auto fleet = vehicleRepo.findAll();
         auto rentals = rentalRepo.findActiveRentals();
-        auto payments = paymentRepo.findByCustomer(0);
-        auto maints = maintenanceRepo.findOpenTasks();
+        auto payments = paymentRepo.findAll();
+        auto maints = maintenanceRepo.findAll();
 
         auto report = fleetEngine.generateReport(fleet, rentals, payments, maints);
+        if (bookingRepo) {
+            auto activeBookings = bookingRepo->findActiveBookings();
+            report.activeBookings = static_cast<int>(activeBookings.size());
+        }
         HttpResponse::success(res, JsonUtils::toJson(report));
     } catch (...) {
         throw;
@@ -38,10 +44,14 @@ void FleetController::getFleetInsights(const httplib::Request& req, httplib::Res
 
         auto fleet = vehicleRepo.findAll();
         auto rentals = rentalRepo.findActiveRentals();
-        auto payments = paymentRepo.findByCustomer(0);
-        auto maints = maintenanceRepo.findOpenTasks();
+        auto payments = paymentRepo.findAll();
+        auto maints = maintenanceRepo.findAll();
 
         auto report = fleetEngine.generateReport(fleet, rentals, payments, maints);
+        if (bookingRepo) {
+            auto activeBookings = bookingRepo->findActiveBookings();
+            report.activeBookings = static_cast<int>(activeBookings.size());
+        }
 
         nlohmann::json insightsArr = nlohmann::json::array();
         for (const auto& ins : report.insights) {

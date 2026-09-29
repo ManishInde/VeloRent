@@ -163,7 +163,7 @@ int main() {
         LoyaltyController loyaltyCtrl(loyaltyService, loyaltyEngine, authMiddleware);
         NotificationController notificationCtrl(notificationService, notificationRepo, authMiddleware);
         IntelligenceController intelligenceCtrl(pricingEngine, recommendationEngine, allocationEngine, vehicleRepo, customerRepo, authMiddleware);
-        FleetController fleetCtrl(fleetEngine, vehicleRepo, rentalRepo, paymentRepo, maintenanceRepo, authMiddleware);
+        FleetController fleetCtrl(fleetEngine, vehicleRepo, rentalRepo, paymentRepo, maintenanceRepo, authMiddleware, &bookingRepo);
 
         // 7. Instantiate & Launch HTTP Server
         HttpServer server(host, port, allowedOrigin, db,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Review, Vehicle } from '@/types';
 import { VehicleImage } from '@/components/vehicles/VehicleImage';
-import { Star, Calendar, KeyRound, Car } from 'lucide-react';
+import { Star, Calendar, Car } from 'lucide-react';
 
 interface ReviewCardProps {
   review: Review;
@@ -10,29 +10,32 @@ interface ReviewCardProps {
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({ review, vehicle }) => {
   return (
-    <div className="p-5 bg-white border border-slate-200/90 rounded-2xl shadow-xs space-y-3 hover:border-slate-300 transition-all">
+    <div className="p-5 bg-[#FFFFFF] border border-[#111111]/25 shadow-[2px_2px_0px_rgba(17,17,17,0.06)] hover:border-[#111111] transition-all duration-150 space-y-3 font-mono">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Left: Vehicle Thumbnail & Name */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-14 h-11 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-200/80 shadow-2xs relative">
+          <div className="w-16 h-12 bg-[#111111] overflow-hidden shrink-0 border border-[#111111]/20 relative">
             {vehicle ? (
               <VehicleImage
                 vehicle={vehicle}
-                aspectRatio="4:3"
+                aspectRatio="auto"
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-slate-400">
+              <div className="w-full h-full flex items-center justify-center text-[#888880]">
                 <Car className="w-5 h-5 stroke-1" />
               </div>
             )}
           </div>
           <div className="truncate">
-            <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-              {vehicle ? `${vehicle.brand} ${vehicle.model}` : `Vehicle #${review.vehicleId}`}
+            <span className="micro-tag text-[#888880] block">
+              {vehicle?.brand || 'FLEET'}
+            </span>
+            <h4 className="font-display text-sm font-black text-[#111111] uppercase tracking-tight truncate">
+              {vehicle ? vehicle.model : `VEHICLE #${review.vehicleId}`}
             </h4>
-            <span className="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
-              <Calendar className="w-3 h-3" /> {review.createdAt || 'Recent trip'}
+            <span className="text-[10px] text-[#777770] flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-[#888880]" /> {review.createdAt || 'RECENT RIDE'}
             </span>
           </div>
         </div>
@@ -42,27 +45,25 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review, vehicle }) => {
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
               key={star}
-              className={`w-4 h-4 ${
-                star <= review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'
+              className={`w-3.5 h-3.5 ${
+                star <= review.rating ? 'fill-[#111111] text-[#111111]' : 'text-[#D3CCC0]'
               }`}
             />
           ))}
-          <span className="ml-1 text-xs font-bold text-slate-800">{review.rating}.0</span>
+          <span className="ml-1 text-xs font-bold text-[#111111]">{review.rating}.0</span>
         </div>
       </div>
 
       {review.comment && (
-        <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+        <p className="text-xs text-[#333330] leading-relaxed bg-[#FAF8F5] p-3.5 border border-[#111111]/10">
           &ldquo;{review.comment}&rdquo;
         </p>
       )}
 
-      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
-        <span className="flex items-center gap-1">
-          <KeyRound className="w-3 h-3 text-slate-400" /> Rental #{review.rentalId}
-        </span>
+      <div className="flex items-center justify-between text-[10px] text-[#888880] pt-2 border-t border-[#111111]/10 uppercase">
+        <span>RENTAL #{review.rentalId}</span>
         {vehicle && (
-          <span className="font-mono text-slate-500 font-semibold">{vehicle.registrationNumber}</span>
+          <span className="font-bold text-[#111111]">{vehicle.registrationNumber}</span>
         )}
       </div>
     </div>

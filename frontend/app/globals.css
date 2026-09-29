@@ -2,91 +2,143 @@
 
 @layer base {
   :root {
-    --bg-main: #F8FAFC;
+    --bg-main: #F4F1EA;
     --bg-surface: #FFFFFF;
-    --bg-subtle: #F1F5F9;
-    --bg-hover: #E2E8F0;
-    
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-muted: #94A3B8;
-    --text-on-primary: #FFFFFF;
+    --bg-paper: #FAF8F5;
+    --bg-subtle: #ECE8E0;
+    --bg-hover: #E4DFD5;
+    --bg-dark: #111111;
+    --bg-dark-surface: #1C1C1A;
 
-    --border-color: #E2E8F0;
-    --border-hover: #CBD5E1;
+    --text-primary: #111111;
+    --text-secondary: #555550;
+    --text-muted: #888880;
+    --text-on-dark: #F4F1EA;
+    --text-on-primary: #111111;
 
-    --brand-primary: #0F172A;
-    --brand-accent: #2563EB;
-    --brand-accent-hover: #1D4ED8;
-    --brand-accent-light: #EFF6FF;
+    --border-color: #E2DDD5;
+    --border-dark: #222220;
+    --border-hover: #111111;
 
-    --status-success: #10B981;
-    --status-success-bg: #ECFDF5;
-    --status-success-text: #065F46;
+    --brand-primary: #111111;
+    --brand-accent: #C7F000;
+    --brand-accent-hover: #B5DC00;
+    --brand-accent-light: #F4FAC8;
+    --brand-purple: #7657FF;
+    --brand-coral: #FF654A;
 
-    --status-warning: #F59E0B;
-    --status-warning-bg: #FFFBEB;
-    --status-warning-text: #92400E;
+    --status-success: #111111;
+    --status-success-bg: #E8F7B5;
+    --status-success-text: #111111;
 
-    --status-error: #EF4444;
-    --status-error-bg: #FEF2F2;
-    --status-error-text: #991B1B;
+    --status-warning: #FF654A;
+    --status-warning-bg: #FFF0ED;
+    --status-warning-text: #C4381F;
 
-    --status-info: #3B82F6;
-    --status-info-bg: #EFF6FF;
-    --status-info-text: #1E40AF;
+    --status-error: #FF654A;
+    --status-error-bg: #FFF0ED;
+    --status-error-text: #C4381F;
+
+    --status-info: #7657FF;
+    --status-info-bg: #F0EDFF;
+    --status-info-text: #5031DE;
   }
 
   .dark {
-    --bg-main: #0B0F17;
-    --bg-surface: #111827;
-    --bg-subtle: #1F2937;
-    --bg-hover: #374151;
+    --bg-main: #111111;
+    --bg-surface: #1C1C1A;
+    --bg-paper: #161614;
+    --bg-subtle: #242422;
+    --bg-hover: #2E2E2B;
+    --bg-dark: #000000;
+    --bg-dark-surface: #161614;
 
-    --text-primary: #F9FAFB;
-    --text-secondary: #9CA3AF;
-    --text-muted: #6B7280;
-    --text-on-primary: #FFFFFF;
+    --text-primary: #F4F1EA;
+    --text-secondary: #AAA8A0;
+    --text-muted: #777670;
+    --text-on-dark: #F4F1EA;
+    --text-on-primary: #111111;
 
-    --border-color: #1F2937;
-    --border-hover: #374151;
+    --border-color: #2E2E2A;
+    --border-dark: #3E3E38;
+    --border-hover: #C7F000;
 
-    --brand-primary: #1E293B;
-    --brand-accent: #3B82F6;
-    --brand-accent-hover: #60A5FA;
-    --brand-accent-light: #1E293B;
+    --brand-primary: #F4F1EA;
+    --brand-accent: #C7F000;
+    --brand-accent-hover: #B5DC00;
+    --brand-accent-light: #2A3300;
+    --brand-purple: #7657FF;
+    --brand-coral: #FF654A;
 
-    --status-success: #10B981;
-    --status-success-bg: #064E3B;
-    --status-success-text: #A7F3D0;
+    --status-success: #C7F000;
+    --status-success-bg: #222B00;
+    --status-success-text: #E4FFA8;
 
-    --status-warning: #F59E0B;
-    --status-warning-bg: #78350F;
-    --status-warning-text: #FDE68A;
+    --status-warning: #FF654A;
+    --status-warning-bg: #38120B;
+    --status-warning-text: #FFB3A6;
 
-    --status-error: #EF4444;
-    --status-error-bg: #7F1D1D;
-    --status-error-text: #FECACA;
+    --status-error: #FF654A;
+    --status-error-bg: #38120B;
+    --status-error-text: #FFB3A6;
 
-    --status-info: #3B82F6;
-    --status-info-bg: #1E3A8A;
-    --status-info-text: #BFDBFE;
+    --status-info: #7657FF;
+    --status-info-bg: #21164E;
+    --status-info-text: #D5CBFF;
   }
 }
 
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom subtle scrollbar */
+/* Editorial Typography & Classes */
+.font-display {
+  font-family: var(--font-display), 'Space Grotesk', -apple-system, sans-serif;
+}
+
+.font-sans {
+  font-family: var(--font-sans), 'Inter', -apple-system, sans-serif;
+}
+
+/* Micro tags with generous letter spacing */
+.micro-tag {
+  font-family: var(--font-display), monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Large display typography for editorial headlines */
+.editorial-display {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+}
+
+/* Editorial section labels */
+.section-label {
+  font-family: var(--font-display), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Custom editorial scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -94,11 +146,11 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 9999px;
-  opacity: 0.4;
+  background: #C4BFB5;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: #111111;
 }
+

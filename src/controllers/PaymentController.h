@@ -14,6 +14,8 @@ public:
     PaymentController(PaymentService& paymentService, AuthMiddleware& authMiddleware);
 
     void processPayment(const httplib::Request& req, httplib::Response& res);
+    void getPaymentsByRental(const httplib::Request& req, httplib::Response& res);
+    void getCustomerPayments(const httplib::Request& req, httplib::Response& res);
 };
 
 } // namespace velorent

@@ -10,7 +10,7 @@ export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   <div
     className={twMerge(
       clsx(
-        'bg-white border border-slate-200 rounded-xl shadow-xs transition-shadow duration-150 hover:shadow-sm',
+        'bg-[#FFFFFF] border border-[#111111]/20 rounded-none shadow-[2px_2px_0px_rgba(17,17,17,0.06)] transition-all duration-150',
         className
       )
     )}
@@ -25,7 +25,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   ...props
 }) => (
-  <div className={twMerge(clsx('p-5 border-b border-slate-100', className))} {...props}>
+  <div className={twMerge(clsx('p-5 border-b border-[#111111]/10', className))} {...props}>
     {children}
   </div>
 );
@@ -35,7 +35,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   children,
   ...props
 }) => (
-  <h3 className={twMerge(clsx('text-base font-semibold text-slate-900 tracking-tight', className))} {...props}>
+  <h3 className={twMerge(clsx('text-base font-display font-bold text-[#111111] uppercase tracking-tight', className))} {...props}>
     {children}
   </h3>
 );
@@ -45,7 +45,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
   children,
   ...props
 }) => (
-  <p className={twMerge(clsx('text-xs text-slate-500 mt-1', className))} {...props}>
+  <p className={twMerge(clsx('text-xs text-[#666660] mt-1', className))} {...props}>
     {children}
   </p>
 );
@@ -65,7 +65,8 @@ export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   ...props
 }) => (
-  <div className={twMerge(clsx('p-5 bg-slate-50/50 border-t border-slate-100 rounded-b-xl', className))} {...props}>
+  <div className={twMerge(clsx('p-5 bg-[#FAF8F5] border-t border-[#111111]/10', className))} {...props}>
     {children}
   </div>
 );
+

@@ -3,36 +3,38 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'slate' | 'blue' | 'emerald' | 'amber' | 'rose' | 'purple';
+  variant?: 'slate' | 'blue' | 'emerald' | 'amber' | 'rose' | 'purple' | 'lime' | 'dark';
   size?: 'sm' | 'md';
 }
 
 export const Badge: React.FC<BadgeProps> = ({
   className,
   variant = 'slate',
-  size = 'md',
+  size = 'sm',
   children,
   ...props
 }) => {
   const variants = {
-    slate: 'bg-slate-100 text-slate-700 border-slate-200',
-    blue: 'bg-blue-50 text-blue-700 border-blue-200',
-    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    amber: 'bg-amber-50 text-amber-800 border-amber-200',
-    rose: 'bg-rose-50 text-rose-700 border-rose-200',
-    purple: 'bg-purple-50 text-purple-700 border-purple-200',
+    slate: 'bg-[#ECE8E0] text-[#222220] border-[#D3CCC0]',
+    blue: 'bg-[#111111] text-[#F4F1EA] border-[#111111]',
+    emerald: 'bg-[#C7F000] text-[#111111] border-[#111111] font-bold',
+    amber: 'bg-[#FFF7D6] text-[#7A5A00] border-[#E0BC38]',
+    rose: 'bg-[#FFF0ED] text-[#C4381F] border-[#FF654A]',
+    purple: 'bg-[#F0EDFF] text-[#5031DE] border-[#7657FF]/40',
+    lime: 'bg-[#C7F000] text-[#111111] border-[#111111] font-bold',
+    dark: 'bg-[#111111] text-[#F4F1EA] border-[#111111]',
   };
 
   const sizes = {
-    sm: 'px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
-    md: 'px-2.5 py-1 text-xs font-semibold tracking-wide',
+    sm: 'px-2 py-0.5 text-[9px] font-display font-bold uppercase tracking-[0.15em]',
+    md: 'px-2.5 py-1 text-[11px] font-display font-bold uppercase tracking-[0.12em]',
   };
 
   return (
     <span
       className={twMerge(
         clsx(
-          'inline-flex items-center rounded-md border font-medium transition-colors',
+          'inline-flex items-center border font-mono select-none transition-colors',
           variants[variant],
           sizes[size],
           className
@@ -44,3 +46,4 @@ export const Badge: React.FC<BadgeProps> = ({
     </span>
   );
 };
+

@@ -29,6 +29,7 @@ struct FleetAnalyticsReport {
     int reservedVehicles = 0;
     int rentedVehicles = 0;
     int maintenanceVehicles = 0;
+    int activeBookings = 0;
     double fleetUtilizationPct = 0.0;
     double totalRevenueINR = 0.0;
     double totalMaintenanceCostINR = 0.0;

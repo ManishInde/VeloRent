@@ -20,6 +20,16 @@ Maintenance MaintenanceRepository::findById(int maintenanceId) {
     return RowMappers::mapMaintenance(rs[0]);
 }
 
+std::vector<Maintenance> MaintenanceRepository::findAll() {
+    std::string sql = "SELECT * FROM maintenance ORDER BY maintenance_id DESC";
+    ResultSet rs = db.executeQuery(sql);
+    std::vector<Maintenance> list;
+    for (const auto& row : rs) {
+        list.push_back(RowMappers::mapMaintenance(row));
+    }
+    return list;
+}
+
 std::vector<Maintenance> MaintenanceRepository::findByVehicle(int vehicleId) {
     std::string sql = "SELECT * FROM maintenance WHERE vehicle_id = ? ORDER BY maintenance_id DESC";
     ResultSet rs = db.executeQuery(sql, {vehicleId});

@@ -20,6 +20,16 @@ Payment PaymentRepository::findById(int paymentId) {
     return RowMappers::mapPayment(rs[0]);
 }
 
+std::vector<Payment> PaymentRepository::findAll() {
+    std::string sql = "SELECT * FROM payments ORDER BY payment_id DESC";
+    ResultSet rs = db.executeQuery(sql);
+    std::vector<Payment> list;
+    for (const auto& row : rs) {
+        list.push_back(RowMappers::mapPayment(row));
+    }
+    return list;
+}
+
 std::vector<Payment> PaymentRepository::findByRental(int rentalId) {
     std::string sql = "SELECT * FROM payments WHERE rental_id = ? ORDER BY payment_id ASC";
     ResultSet rs = db.executeQuery(sql, {rentalId});

@@ -157,6 +157,26 @@ export interface ReviewCreateRequest {
   comment?: string;
 }
 
+export interface StaffReview {
+  id: number;
+  rating: number;
+  comment: string;
+  rentalId: number;
+  vehicle: {
+    id: number;
+    brand: string;
+    model: string;
+    type?: string;
+    registrationNumber?: string;
+  };
+  customer: {
+    id: number;
+    name: string;
+    email?: string;
+  };
+  createdAt: string;
+}
+
 // ---- Loyalty ----
 
 export type LoyaltyTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';

@@ -20,6 +20,19 @@ int PaymentService::processPayment(int rentalId, double amount, PaymentMethod me
 
     validatePayment(amount, method, pType);
 
+    // Duplicate payment protection
+    auto existingPayments = paymentRepo.findByRental(rentalId);
+    for (const auto& p : existingPayments) {
+        if (!txnRef.empty() && p.getTransactionId() == txnRef) {
+            throw PaymentException("Duplicate payment detected: transaction reference " + txnRef + " has already been processed.");
+        }
+        if (p.getStatus() == PaymentStatus::COMPLETED &&
+            (pType == PaymentType::BASE_RENT || pType == PaymentType::RENTAL_FEE) &&
+            (p.getPaymentType() == PaymentType::BASE_RENT || p.getPaymentType() == PaymentType::RENTAL_FEE)) {
+            throw PaymentException("Base rental fee has already been paid for this rental.");
+        }
+    }
+
     int payId = paymentRepo.processPayment(rentalId, amount, method, pType, pointsUsed, txnRef, actorId);
     Logger::info("PaymentService: Payment completed with Payment ID " + std::to_string(payId));
     return payId;

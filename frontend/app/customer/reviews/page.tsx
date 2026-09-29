@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -74,42 +73,74 @@ export default function CustomerReviewsPage() {
   return (
     <ProtectedRoute allowedRoles={['CUSTOMER']}>
       <AppShell>
-        <PageHeader
-          title="My Vehicle Reviews"
-          description="Rate and leave feedback on your completed vehicle rentals."
-          action={
-            unreviewedRentals.length > 0 && !showForm ? (
-              <Button
-                size="sm"
-                leftIcon={<Plus className="w-4 h-4" />}
-                onClick={() => {
-                  setSelectedRentalId(unreviewedRentals[0].id);
-                  setShowForm(true);
-                }}
-              >
-                Write a Review
-              </Button>
-            ) : undefined
-          }
-        />
+        {/* Editorial Reviews Header */}
+        <div className="mb-8 border-b border-[#111111]/15 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <span className="micro-tag text-[#777770] block mb-1">
+              FLEET TELEMETRY & FEEDBACK
+            </span>
+            <h1 className="editorial-display text-4xl sm:text-5xl md:text-6xl text-[#111111]">
+              YOUR RIDES
+            </h1>
+            <p className="text-sm text-[#555550] font-mono mt-1 max-w-xl">
+              Rate vehicle driving dynamics, interior cleanliness, and engine performance on completed trips.
+            </p>
+          </div>
+
+          {unreviewedRentals.length > 0 && !showForm && (
+            <Button
+              size="sm"
+              variant="primary"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setSelectedRentalId(unreviewedRentals[0].id);
+                setShowForm(true);
+              }}
+            >
+              WRITE REVIEW
+            </Button>
+          )}
+        </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+          <div className="mb-6 p-4 bg-[#FFF0ED] border border-[#FF654A] text-[#C4381F] text-xs font-mono flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Form Container */}
+        {/* Unreviewed Completed Rides Banner */}
+        {unreviewedRentals.length > 0 && !showForm && (
+          <div className="mb-8 p-5 bg-[#FAF8F5] border-2 border-[#111111] shadow-[3px_3px_0px_#111111] flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs">
+            <div>
+              <span className="micro-tag text-[#111111] block mb-0.5">COMPLETED RIDE ELIGIBLE FOR REVIEW</span>
+              <p className="font-bold text-[#111111] text-sm uppercase">
+                Rental #{unreviewedRentals[0].id} completed — Share your feedback with the fleet.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => {
+                setSelectedRentalId(unreviewedRentals[0].id);
+                setShowForm(true);
+              }}
+            >
+              WRITE REVIEW
+            </Button>
+          </div>
+        )}
+
+        {/* Review Form Container */}
         {showForm && selectedRentalId && (
-          <div className="mb-8 max-w-xl">
+          <div className="mb-8 max-w-xl font-mono text-xs">
             {completedRentals.length > 1 && (
               <div className="mb-3">
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Select Completed Rental</label>
+                <label className="block micro-tag text-[#777770] mb-1">SELECT COMPLETED RENTAL</label>
                 <select
                   value={selectedRentalId}
                   onChange={(e) => setSelectedRentalId(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none"
+                  className="w-full p-2.5 bg-white border border-[#111111]/30 font-mono text-xs text-[#111111] focus:outline-none"
                 >
                   {completedRentals.map((r) => {
                     const isReviewed = reviewedRentalIds.has(r.id);
@@ -131,11 +162,11 @@ export default function CustomerReviewsPage() {
           </div>
         )}
 
-        {/* Content */}
+        {/* Reviews Grid */}
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-28 w-full rounded-none" />
+            <Skeleton className="h-28 w-full rounded-none" />
           </div>
         ) : reviews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -149,25 +180,25 @@ export default function CustomerReviewsPage() {
           </div>
         ) : (
           <EmptyState
-            icon={<Star className="w-10 h-10 text-slate-400" />}
-            title="No reviews submitted yet."
-            description="After completing a vehicle rental, you can rate and submit feedback for the fleet."
+            icon={<Star className="w-10 h-10 text-[#888880]" />}
+            title="NO RIDE REVIEWS LOGGED"
+            description="Complete a rental journey to submit telemetry and condition reviews for the vehicle."
             action={
               unreviewedRentals.length > 0 ? (
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="primary"
                   onClick={() => {
                     setSelectedRentalId(unreviewedRentals[0].id);
                     setShowForm(true);
                   }}
                 >
-                  Leave a Review
+                  LEAVE A REVIEW
                 </Button>
               ) : (
                 <Link href="/customer/rentals">
                   <Button size="sm" variant="outline">
-                    View My Rentals
+                    VIEW MY GARAGE
                   </Button>
                 </Link>
               )

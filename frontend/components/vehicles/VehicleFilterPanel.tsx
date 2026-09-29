@@ -17,13 +17,13 @@ export interface VehicleFilterPanelProps {
 }
 
 const CATEGORY_TABS = [
-  { label: 'All Fleet', categoryId: undefined },
+  { label: 'ALL LOT', categoryId: undefined },
   { label: 'SUV', categoryId: 3 },
-  { label: 'Sedan', categoryId: 2 },
-  { label: 'Hatchback', categoryId: 1 },
-  { label: 'Luxury', categoryId: 4 },
-  { label: 'Electric', categoryId: 5 },
-  { label: 'Motorcycle', categoryId: 6 },
+  { label: 'SEDAN', categoryId: 2 },
+  { label: 'HATCHBACK', categoryId: 1 },
+  { label: 'LUXURY', categoryId: 4 },
+  { label: 'ELECTRIC', categoryId: 5 },
+  { label: 'MOTORCYCLE', categoryId: 6 },
 ];
 
 export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
@@ -38,31 +38,31 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
 
   const fuelOptions = [
-    { label: 'All Fuel Types', value: '' },
-    { label: 'Petrol', value: 'PETROL' },
-    { label: 'Diesel', value: 'DIESEL' },
-    { label: 'Electric', value: 'ELECTRIC' },
-    { label: 'Hybrid', value: 'HYBRID' },
+    { label: 'ALL FUEL TYPES', value: '' },
+    { label: 'PETROL', value: 'PETROL' },
+    { label: 'DIESEL', value: 'DIESEL' },
+    { label: 'ELECTRIC', value: 'ELECTRIC' },
+    { label: 'HYBRID', value: 'HYBRID' },
   ];
 
   const transmissionOptions = [
-    { label: 'All Transmissions', value: '' },
-    { label: 'Manual', value: 'MANUAL' },
-    { label: 'Automatic', value: 'AUTOMATIC' },
+    { label: 'ALL TRANSMISSIONS', value: '' },
+    { label: 'MANUAL', value: 'MANUAL' },
+    { label: 'AUTOMATIC', value: 'AUTOMATIC' },
   ];
 
   const statusOptions = [
-    { label: 'All Statuses', value: '' },
-    { label: 'Available Only', value: 'AVAILABLE' },
-    { label: 'Rented', value: 'RENTED' },
-    { label: 'Maintenance', value: 'MAINTENANCE' },
+    { label: 'ALL FLEET STATUS', value: '' },
+    { label: 'AVAILABLE ONLY', value: 'AVAILABLE' },
+    { label: 'RENTED', value: 'RENTED' },
+    { label: 'MAINTENANCE', value: 'MAINTENANCE' },
   ];
 
   const sortOptions = [
-    { label: 'Price: Low to High', value: 'price_asc' },
-    { label: 'Price: High to Low', value: 'price_desc' },
-    { label: 'Health Score', value: 'health_desc' },
-    { label: 'Newest Model Year', value: 'newest' },
+    { label: 'PRICE: LOW TO HIGH', value: 'price_asc' },
+    { label: 'PRICE: HIGH TO LOW', value: 'price_desc' },
+    { label: 'HEALTH SCORE', value: 'health_desc' },
+    { label: 'NEWEST MODEL YEAR', value: 'newest' },
   ];
 
   const hasActiveFilters = Boolean(
@@ -74,11 +74,11 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs mb-8 overflow-hidden transition-all">
-      {/* Category Quick Selector Pills */}
-      <div className="px-4 py-3 bg-slate-50/70 border-b border-slate-200/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1.5 hidden sm:inline">
-          Category:
+    <div className="bg-[#FFFFFF] border border-[#111111]/25 mb-8 shadow-[2px_2px_0px_rgba(17,17,17,0.06)]">
+      {/* Category Navigation Strip */}
+      <div className="px-4 py-2.5 bg-[#FAF8F5] border-b border-[#111111]/15 flex items-center gap-1 overflow-x-auto scrollbar-none">
+        <span className="micro-tag text-[#777770] shrink-0 mr-3 hidden sm:inline">
+          CATEGORY /
         </span>
         {CATEGORY_TABS.map((cat) => {
           const isSelected = filters.categoryId === cat.categoryId;
@@ -87,10 +87,10 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
               key={cat.label}
               onClick={() => onChange({ ...filters, categoryId: cat.categoryId })}
               className={clsx(
-                'px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150',
+                'px-3 py-1 font-display text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-150 cursor-pointer',
                 isSelected
-                  ? 'bg-slate-900 text-white shadow-xs font-bold ring-1 ring-slate-900'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-[#111111] text-[#C7F000] shadow-[2px_2px_0px_#C7F000]'
+                  : 'text-[#666660] hover:text-[#111111] hover:bg-[#ECE8E0]'
               )}
             >
               {cat.label}
@@ -99,15 +99,16 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
         })}
       </div>
 
-      <div className="p-4 sm:p-5 space-y-3.5">
-        {/* Main Search & Quick Controls Row */}
+      <div className="p-4 sm:p-5 space-y-4">
+        {/* Main Search & Sort Bar */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
           <div className="flex-1">
             <Input
-              placeholder="Search by brand, model (e.g. Creta, Nexon, BMW, Swift)..."
-              leftIcon={<Search className="w-4 h-4 text-slate-400" />}
+              placeholder="SEARCH LOT BY BRAND, MODEL (E.G. CRETA, BMW, NEXON, SWIFT)..."
+              leftIcon={<Search className="w-4 h-4 text-[#777770]" />}
               value={filters.search || ''}
               onChange={(e) => onChange({ ...filters, search: e.target.value })}
+              className="font-mono text-xs uppercase"
             />
           </div>
 
@@ -116,78 +117,84 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="lg:hidden flex items-center gap-1.5 text-xs font-semibold text-slate-700"
+              className="lg:hidden flex items-center gap-1.5"
               onClick={() => setIsMobileExpanded(!isMobileExpanded)}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
-              <span>Filters {hasActiveFilters && '• Active'}</span>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>FILTERS {hasActiveFilters && '• ACTIVE'}</span>
               {isMobileExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </Button>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider shrink-0 hidden sm:inline">
-                Sort:
+              <span className="micro-tag text-[#777770] shrink-0 hidden sm:inline">
+                SORT /
               </span>
               <Select
                 options={sortOptions}
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value as SortOption)}
-                className="w-44 text-xs font-medium"
+                className="w-48 text-[11px] font-mono uppercase"
               />
             </div>
           </div>
         </div>
 
-        {/* Detailed Filters (Always visible on desktop, collapsible on mobile) */}
+        {/* Detailed Secondary Filters */}
         <div
           className={clsx(
-            'grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100',
+            'grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#111111]/10',
             !isMobileExpanded && 'hidden lg:grid'
           )}
         >
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-              Fuel Type
+            <label className="block micro-tag text-[#777770] mb-1.5">
+              01 / FUEL TYPE
             </label>
             <Select
               options={fuelOptions}
               value={filters.fuelType || ''}
               onChange={(e) => onChange({ ...filters, fuelType: e.target.value as VehicleFilterParams['fuelType'] })}
+              className="text-[11px] font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-              Transmission
+            <label className="block micro-tag text-[#777770] mb-1.5">
+              02 / TRANSMISSION
             </label>
             <Select
               options={transmissionOptions}
               value={filters.transmission || ''}
               onChange={(e) => onChange({ ...filters, transmission: e.target.value as VehicleFilterParams['transmission'] })}
+              className="text-[11px] font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-              Fleet Status
+            <label className="block micro-tag text-[#777770] mb-1.5">
+              03 / FLEET STATUS
             </label>
             <Select
               options={statusOptions}
               value={filters.status || ''}
               onChange={(e) => onChange({ ...filters, status: e.target.value as VehicleFilterParams['status'] })}
+              className="text-[11px] font-mono"
             />
           </div>
         </div>
 
-        {/* Bottom Toolbar: Count & Reset */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500">
+        {/* Status Toolbar */}
+        <div className="flex items-center justify-between pt-2 border-t border-[#111111]/10 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-800">
+            <span className="text-[#111111] font-bold">
               {isLoading ? (
-                'Filtering vehicles...'
+                'UPDATING FLEET LOT...'
               ) : (
                 <>
-                  <span className="text-blue-600 font-extrabold">{resultsCount}</span> {resultsCount === 1 ? 'vehicle' : 'vehicles'} available
+                  <span className="text-[#111111] bg-[#C7F000] px-1.5 py-0.5 border border-[#111111] font-black mr-1">
+                    {resultsCount}
+                  </span>{' '}
+                  {resultsCount === 1 ? 'VEHICLE ON THE LOT' : 'VEHICLES ON THE LOT'}
                 </>
               )}
             </span>
@@ -198,10 +205,10 @@ export const VehicleFilterPanel: React.FC<VehicleFilterPanelProps> = ({
               variant="ghost"
               size="sm"
               onClick={onReset}
-              className="text-xs text-slate-600 hover:text-rose-600 hover:bg-rose-50"
+              className="text-[#FF654A] hover:bg-[#FFF0ED]"
               leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
             >
-              Reset Filters
+              RESET FILTERS
             </Button>
           )}
         </div>

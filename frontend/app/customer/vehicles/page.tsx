@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { VehicleGrid } from '@/components/vehicles/VehicleGrid';
 import { VehicleFilterPanel } from '@/components/vehicles/VehicleFilterPanel';
@@ -12,8 +11,24 @@ import { getVehicles } from '@/lib/api/vehicles';
 import { Vehicle, VehicleFilterParams, SortOption } from '@/types';
 import { LoadingState } from '@/components/ui/LoadingState';
 
+const CATEGORY_NAME_TO_ID: Record<string, number> = {
+  hatchback: 1,
+  sedan: 2,
+  suv: 3,
+  luxury: 4,
+  electric: 5,
+  motorcycle: 6,
+  bike: 6,
+};
+
+function parseCategoryId(val: string | null): number | undefined {
+  if (!val) return undefined;
+  const num = Number(val);
+  if (!isNaN(num) && num > 0) return num;
+  return CATEGORY_NAME_TO_ID[val.toLowerCase().trim()];
+}
+
 function VehicleMarketplaceContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -22,20 +37,20 @@ function VehicleMarketplaceContent() {
 
   // Initialize filters from URL query params
   const [filters, setFilters] = useState<VehicleFilterParams>(() => {
-    const cat = searchParams.get('categoryId');
+    const cat = searchParams.get('categoryId') || searchParams.get('category');
     return {
       search: searchParams.get('search') || '',
       fuelType: (searchParams.get('fuelType') as VehicleFilterParams['fuelType']) || '',
       transmission: (searchParams.get('transmission') as VehicleFilterParams['transmission']) || '',
       status: (searchParams.get('status') as VehicleFilterParams['status']) || '',
-      categoryId: cat ? Number(cat) : undefined,
+      categoryId: parseCategoryId(cat),
     };
   });
   const [sortBy, setSortBy] = useState<SortOption>(
     (searchParams.get('sort') as SortOption) || 'price_asc'
   );
 
-  // Sync filters to URL
+  // Sync filters to URL without triggering full Next.js page remounts
   const syncURL = useCallback((f: VehicleFilterParams, s: SortOption) => {
     const params = new URLSearchParams();
     if (f.search) params.set('search', f.search);
@@ -45,8 +60,29 @@ function VehicleMarketplaceContent() {
     if (f.categoryId !== undefined) params.set('categoryId', String(f.categoryId));
     if (s !== 'price_asc') params.set('sort', s);
     const qs = params.toString();
-    router.replace(`/customer/vehicles${qs ? `?${qs}` : ''}`, { scroll: false });
-  }, [router]);
+    const targetUrl = `/customer/vehicles${qs ? `?${qs}` : ''}`;
+    if (typeof window !== 'undefined' && (window.location.pathname + window.location.search) !== targetUrl) {
+      window.history.replaceState(null, '', targetUrl);
+    }
+  }, []);
+
+  // Sync state if browser back/forward is used
+  useEffect(() => {
+    const handlePopState = () => {
+      const sp = new URLSearchParams(window.location.search);
+      const cat = sp.get('categoryId') || sp.get('category');
+      setFilters({
+        search: sp.get('search') || '',
+        fuelType: (sp.get('fuelType') as VehicleFilterParams['fuelType']) || '',
+        transmission: (sp.get('transmission') as VehicleFilterParams['transmission']) || '',
+        status: (sp.get('status') as VehicleFilterParams['status']) || '',
+        categoryId: parseCategoryId(cat),
+      });
+      setSortBy((sp.get('sort') as SortOption) || 'price_asc');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Fetch vehicles (debounced for search)
   useEffect(() => {
@@ -55,7 +91,6 @@ function VehicleMarketplaceContent() {
       setIsLoading(true);
       setError(null);
       try {
-        // Send server-supported filters to backend
         const serverFilters: VehicleFilterParams = {};
         if (filters.search) serverFilters.search = filters.search;
         if (filters.fuelType) serverFilters.fuelType = filters.fuelType;
@@ -75,7 +110,7 @@ function VehicleMarketplaceContent() {
       } finally {
         if (isMounted) setIsLoading(false);
       }
-    }, 300);
+    }, 250);
 
     return () => {
       isMounted = false;
@@ -137,14 +172,28 @@ export default function VehiclesPage() {
   return (
     <ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN', 'FLEET_MANAGER']}>
       <AppShell>
-        <PageHeader
-          title="Browse Vehicles"
-          description="Find a vehicle that fits your journey."
-          breadcrumbs={[
-            { label: 'Dashboard', href: '/customer' },
-            { label: 'Vehicles' },
-          ]}
-        />
+        {/* Editorial Marketplace Header */}
+        <div className="mb-8 border-b border-[#111111]/15 pb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <span className="micro-tag text-[#777770] block mb-1">
+                04 / VEHICLE MARKETPLACE
+              </span>
+              <h1 className="editorial-display text-4xl sm:text-5xl md:text-6xl text-[#111111]">
+                FIND YOUR RIDE.
+              </h1>
+              <p className="text-sm text-[#555550] mt-2 font-mono max-w-xl">
+                Curated automotive catalogue. Real-time dynamic pricing quotes, verified fleet diagnostics, and instant checkout.
+              </p>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-3 font-mono text-xs text-[#777770]">
+              <span className="inline-block w-2 h-2 bg-[#C7F000] border border-[#111111]" />
+              <span>LIVE INVENTORY</span>
+            </div>
+          </div>
+        </div>
+
         <Suspense fallback={<LoadingState label="Loading marketplace..." />}>
           <VehicleMarketplaceContent />
         </Suspense>

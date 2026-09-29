@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Booking, Vehicle } from '@/types';
-import { Card, CardContent } from '@/components/ui/Card';
 import { BookingStatusBadge } from '@/components/ui/StatusBadge';
 import { VehicleImage } from '@/components/vehicles/VehicleImage';
 import { Calendar, ArrowRight, Car } from 'lucide-react';
@@ -29,74 +28,79 @@ const getDays = (start: string, end: string) => {
 export interface BookingCardProps {
   booking: Booking;
   vehicleMap?: Map<number, Vehicle>;
+  index?: number;
 }
 
-export const BookingCard: React.FC<BookingCardProps> = ({ booking, vehicleMap }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, vehicleMap, index = 0 }) => {
   const vehicle = vehicleMap?.get(booking.vehicleId);
   const days = getDays(booking.startDate, booking.endDate);
+  const itemNumber = String(index + 1).padStart(2, '0');
 
   return (
-    <Link href={`/customer/bookings/${booking.id}`} className="block">
-      <Card className="hover:border-slate-300 hover:shadow-md transition-all duration-200 cursor-pointer group overflow-hidden">
-        <CardContent className="p-4 sm:p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Left: Thumbnail & Info */}
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-20 h-16 sm:w-24 sm:h-18 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/80 shadow-2xs relative">
-                {vehicle ? (
-                  <VehicleImage
-                    vehicle={vehicle}
-                    aspectRatio="4:3"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-400">
-                    <Car className="w-6 h-6 stroke-1" />
-                  </div>
-                )}
-              </div>
+    <Link href={`/customer/bookings/${booking.id}`} className="block group">
+      <div className="bg-[#FFFFFF] border border-[#111111]/20 hover:border-[#111111] shadow-[2px_2px_0px_rgba(17,17,17,0.06)] hover:shadow-[4px_4px_0px_#111111] p-4 sm:p-5 transition-all duration-150">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Left: Sequential Index + Vehicle Thumbnail + Info */}
+          <div className="flex items-center gap-4 min-w-0">
+            <span className="font-display font-black text-xl sm:text-2xl text-[#888880] w-8 shrink-0">
+              {itemNumber}
+            </span>
 
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Booking #{booking.id}
-                  </span>
-                  <BookingStatusBadge status={booking.status} />
-                  <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                    {days} {days === 1 ? 'day' : 'days'}
-                  </span>
+            <div className="w-20 h-14 sm:w-28 sm:h-18 bg-[#111111] overflow-hidden shrink-0 border border-[#111111]/20 relative">
+              {vehicle ? (
+                <VehicleImage
+                  vehicle={vehicle}
+                  aspectRatio="auto"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[#888880]">
+                  <Car className="w-6 h-6 stroke-1" />
                 </div>
-
-                <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
-                  {vehicle ? `${vehicle.brand} ${vehicle.model}` : `Vehicle #${booking.vehicleId}`}
-                </h4>
-
-                <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-500">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="truncate">
-                    {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Right: Amount & CTA */}
-            <div className="flex items-center justify-between sm:justify-end gap-5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-              <div className="text-left sm:text-right">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block">
-                  Total Payable
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="micro-tag text-[#777770]">
+                  BOOKING #{booking.id}
                 </span>
-                <span className="text-base sm:text-lg font-extrabold text-slate-900 tabular-nums">
-                  {formatINR(booking.totalPrice)}
+                <BookingStatusBadge status={booking.status} />
+                <span className="text-[10px] font-mono text-[#555550] bg-[#FAF8F5] px-1.5 py-0.5 border border-[#111111]/10">
+                  {days} {days === 1 ? 'DAY' : 'DAYS'}
                 </span>
               </div>
-              <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white text-slate-400 transition-colors">
-                <ArrowRight className="w-4 h-4" />
+
+              <h4 className="font-display text-base sm:text-lg font-black text-[#111111] uppercase tracking-tight truncate group-hover:text-[#7657FF] transition-colors">
+                {vehicle ? `${vehicle.brand} ${vehicle.model}` : `VEHICLE SPECIMEN #${booking.vehicleId}`}
+              </h4>
+
+              <div className="flex items-center gap-2 mt-1 text-xs font-mono text-[#666660]">
+                <Calendar className="w-3.5 h-3.5 text-[#888880] shrink-0" />
+                <span className="truncate uppercase">
+                  {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+                </span>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Right: Amount & Action */}
+          <div className="flex items-center justify-between sm:justify-end gap-5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#111111]/10">
+            <div className="text-left sm:text-right">
+              <span className="micro-tag text-[#888880] block">
+                TOTAL PAYABLE
+              </span>
+              <span className="font-display text-lg sm:text-xl font-black text-[#111111] tabular-nums">
+                {formatINR(booking.totalPrice)}
+              </span>
+            </div>
+
+            <div className="w-9 h-9 border border-[#111111] bg-[#FAF8F5] group-hover:bg-[#C7F000] group-hover:text-[#111111] flex items-center justify-center text-[#111111] transition-colors shrink-0">
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 };

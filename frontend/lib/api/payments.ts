@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { Payment, ApiResponse, PaymentProcessRequest } from '@/types';
+import { Payment, ApiResponse, ApiCollectionResponse, PaymentProcessRequest } from '@/types';
 
 export async function processPayment(
   rentalId: number,
@@ -13,4 +13,18 @@ export async function processPayment(
     throw new Error('Payment processing failed.');
   }
   return response.data;
+}
+
+export async function getRentalPayments(rentalId: number): Promise<Payment[]> {
+  const response = await apiClient.get<ApiCollectionResponse<Payment>>(`/api/rentals/${rentalId}/payments`, {
+    cache: 'no-store',
+  });
+  return response.data ?? [];
+}
+
+export async function getCustomerPayments(customerId: number): Promise<Payment[]> {
+  const response = await apiClient.get<ApiCollectionResponse<Payment>>(`/api/customers/${customerId}/payments`, {
+    cache: 'no-store',
+  });
+  return response.data ?? [];
 }

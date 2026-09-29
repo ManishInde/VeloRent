@@ -14,6 +14,7 @@ public:
     explicit MaintenanceRepository(DatabaseManager& dbManager = DatabaseManager::getInstance());
 
     Maintenance findById(int maintenanceId);
+    std::vector<Maintenance> findAll();
     std::vector<Maintenance> findByVehicle(int vehicleId);
     std::vector<Maintenance> findOpenTasks();
 

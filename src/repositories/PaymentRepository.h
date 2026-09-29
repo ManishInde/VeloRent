@@ -13,6 +13,7 @@ public:
     explicit PaymentRepository(DatabaseManager& dbManager = DatabaseManager::getInstance());
 
     Payment findById(int paymentId);
+    std::vector<Payment> findAll();
     std::vector<Payment> findByRental(int rentalId);
     std::vector<Payment> findByCustomer(int customerId);
 

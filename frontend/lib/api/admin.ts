@@ -14,7 +14,9 @@ import {
 } from '@/types';
 
 export async function getFleetAnalytics(): Promise<FleetAnalyticsReport> {
-  const response = await apiClient.get<ApiResponse<FleetAnalyticsReport>>('/api/fleet/analytics');
+  const response = await apiClient.get<ApiResponse<FleetAnalyticsReport>>('/api/fleet/analytics', {
+    cache: 'no-store',
+  });
   if (!response.data) {
     throw new Error('Failed to load fleet analytics report.');
   }
@@ -22,7 +24,9 @@ export async function getFleetAnalytics(): Promise<FleetAnalyticsReport> {
 }
 
 export async function getFleetInsights(): Promise<FleetInsight[]> {
-  const response = await apiClient.get<ApiCollectionResponse<FleetInsight>>('/api/fleet/insights');
+  const response = await apiClient.get<ApiCollectionResponse<FleetInsight>>('/api/fleet/insights', {
+    cache: 'no-store',
+  });
   return response.data ?? [];
 }
 

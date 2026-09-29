@@ -247,6 +247,7 @@ nlohmann::json JsonUtils::toJson(const FleetAnalyticsReport& r) {
     j["reservedVehicles"] = r.reservedVehicles;
     j["rentedVehicles"] = r.rentedVehicles;
     j["maintenanceVehicles"] = r.maintenanceVehicles;
+    j["activeBookings"] = r.activeBookings;
     j["fleetUtilizationPct"] = r.fleetUtilizationPct;
     j["totalRevenueINR"] = r.totalRevenueINR;
     j["totalMaintenanceCostINR"] = r.totalMaintenanceCostINR;

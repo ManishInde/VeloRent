@@ -4,6 +4,9 @@
 #include "Logger.h"
 #include "EnumUtils.h"
 #include <algorithm>
+#include <cctype>
+#include <sstream>
+#include <string>
 
 namespace velorent {
 
@@ -31,12 +34,25 @@ std::vector<std::shared_ptr<Vehicle>> VehicleService::getAvailableVehicles() {
     return vehicleRepo.findAvailable();
 }
 
-#include <cctype>
-
 static std::string toLowerString(const std::string& str) {
     std::string lower = str;
     std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return std::tolower(c); });
     return lower;
+}
+
+static std::string trimString(const std::string& str) {
+    size_t first = str.find_first_not_of(" \t\n\r");
+    if (first == std::string::npos) return "";
+    size_t last = str.find_last_not_of(" \t\n\r");
+    return str.substr(first, (last - first + 1));
+}
+
+static std::string stripPunctuation(const std::string& str) {
+    std::string res;
+    for (char c : str) {
+        if (c != '-' && c != ' ' && c != '_') res += std::tolower(static_cast<unsigned char>(c));
+    }
+    return res;
 }
 
 std::vector<std::shared_ptr<Vehicle>> VehicleService::searchVehicles(const VehicleFilter& filter) {
@@ -56,23 +72,47 @@ std::vector<std::shared_ptr<Vehicle>> VehicleService::searchVehicles(const Vehic
 
         if (!filter.brand.empty()) {
             std::string vBrand = toLowerString(v->getBrand());
-            std::string qBrand = toLowerString(filter.brand);
-            if (vBrand.find(qBrand) == std::string::npos) continue;
+            std::string qBrand = trimString(toLowerString(filter.brand));
+            if (!qBrand.empty() && vBrand.find(qBrand) == std::string::npos) continue;
         }
 
         if (!filter.searchTerm.empty()) {
-            std::string query = toLowerString(filter.searchTerm);
-            std::string brand = toLowerString(v->getBrand());
-            std::string model = toLowerString(v->getModel());
-            std::string fullName = brand + " " + model;
-            std::string reg = toLowerString(v->getRegistrationNumber());
+            std::string rawQuery = trimString(toLowerString(filter.searchTerm));
+            if (!rawQuery.empty()) {
+                std::string brand = toLowerString(v->getBrand());
+                std::string model = toLowerString(v->getModel());
+                std::string fullName = brand + " " + model;
+                std::string reg = toLowerString(v->getRegistrationNumber());
 
-            bool match = (brand.find(query) != std::string::npos) ||
-                         (model.find(query) != std::string::npos) ||
-                         (fullName.find(query) != std::string::npos) ||
-                         (reg.find(query) != std::string::npos);
+                std::string cleanQuery = stripPunctuation(rawQuery);
+                std::string cleanReg = stripPunctuation(reg);
 
-            if (!match) continue;
+                // Direct substring matches
+                bool directMatch = (brand.find(rawQuery) != std::string::npos) ||
+                                   (model.find(rawQuery) != std::string::npos) ||
+                                   (fullName.find(rawQuery) != std::string::npos) ||
+                                   (reg.find(rawQuery) != std::string::npos) ||
+                                   (!cleanQuery.empty() && cleanReg.find(cleanQuery) != std::string::npos);
+
+                // Word tokenized matching (e.g. "BMW 3 Series", "Tata Nexon", "Nexon Tata")
+                bool tokenMatch = true;
+                std::istringstream iss(rawQuery);
+                std::string word;
+                int tokenCount = 0;
+                while (iss >> word) {
+                    tokenCount++;
+                    if (brand.find(word) == std::string::npos &&
+                        model.find(word) == std::string::npos &&
+                        fullName.find(word) == std::string::npos &&
+                        reg.find(word) == std::string::npos) {
+                        tokenMatch = false;
+                        break;
+                    }
+                }
+                if (tokenCount == 0) tokenMatch = false;
+
+                if (!directMatch && !tokenMatch) continue;
+            }
         }
 
         result.push_back(v);

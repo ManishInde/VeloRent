@@ -35,10 +35,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             className={twMerge(
               clsx(
-                'w-full bg-white text-slate-900 border rounded-lg text-sm appearance-none transition-colors duration-150 pr-9 pl-3.5 py-2.5',
-                'focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent',
-                'disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed',
-                error ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 hover:border-slate-400',
+                'w-full bg-[#FFFFFF] text-[#111111] border rounded-none text-xs font-medium appearance-none transition-all duration-150 pr-9 pl-3.5 py-2.5',
+                'focus:outline-none focus:border-[#111111] focus:ring-1 focus:ring-[#111111]',
+                'disabled:bg-[#ECE8E0] disabled:text-[#888880] disabled:cursor-not-allowed',
+                error ? 'border-[#FF654A] focus:border-[#FF654A] focus:ring-[#FF654A]' : 'border-[#111111]/25 hover:border-[#111111]',
                 className
               )
             )}

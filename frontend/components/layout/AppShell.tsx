@@ -26,13 +26,15 @@ import {
   ShieldCheck,
   Sparkles,
   Zap,
+  ArrowRight,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface NavItem {
+  number?: string;
   label: string;
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   badge?: number;
 }
 
@@ -63,7 +65,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }, [user, pathname]);
 
   const getInitials = (name: string) => {
-    if (!name) return 'U';
+    if (!name) return 'VR';
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -71,54 +73,37 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return name.slice(0, 2).toUpperCase();
   };
 
-  const getNavGroups = (): NavGroup[] => {
+  const isCustomer = user?.role === 'CUSTOMER';
+
+  const customerNavItems: NavItem[] = [
+    { number: '01', label: 'DISCOVER', href: '/customer' },
+    { number: '02', label: 'GARAGE', href: '/customer/profile' },
+    { number: '03', label: 'BOOKINGS', href: '/customer/bookings' },
+    { number: '04', label: 'RIDES', href: '/customer/rentals' },
+    { number: '05', label: 'REWARDS', href: '/customer/loyalty' },
+  ];
+
+  const getAdminFleetNavGroups = (): NavGroup[] => {
     if (!user) return [];
 
     switch (user.role) {
-      case 'CUSTOMER':
-        return [
-          {
-            title: 'Marketplace',
-            items: [
-              { label: 'Dashboard', href: '/customer', icon: <LayoutDashboard className="w-4 h-4" /> },
-              { label: 'Browse Vehicles', href: '/customer/vehicles', icon: <Car className="w-4 h-4" /> },
-            ],
-          },
-          {
-            title: 'My Trips',
-            items: [
-              { label: 'My Bookings', href: '/customer/bookings', icon: <Calendar className="w-4 h-4" /> },
-              { label: 'My Rentals', href: '/customer/rentals', icon: <KeyRound className="w-4 h-4" /> },
-              { label: 'My Payments', href: '/customer/payments', icon: <CreditCard className="w-4 h-4" /> },
-            ],
-          },
-          {
-            title: 'Rewards & Account',
-            items: [
-              { label: 'Loyalty Rewards', href: '/customer/loyalty', icon: <Award className="w-4 h-4 text-amber-500" /> },
-              {
-                label: 'Notifications',
-                href: '/customer/notifications',
-                icon: <Bell className="w-4 h-4" />,
-                badge: unreadNotifCount > 0 ? unreadNotifCount : undefined,
-              },
-              { label: 'My Reviews', href: '/customer/reviews', icon: <Star className="w-4 h-4 text-amber-400" /> },
-              { label: 'Profile', href: '/customer/profile', icon: <UserIcon className="w-4 h-4" /> },
-            ],
-          },
-        ];
       case 'ADMIN':
         return [
           {
-            title: 'Administration',
+            title: 'Operations',
             items: [
-              { label: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="w-4 h-4" /> },
-              { label: 'Manage Users', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
-              { label: 'Fleet Vehicles', href: '/admin/vehicles', icon: <Car className="w-4 h-4" /> },
-              { label: 'Bookings', href: '/admin/bookings', icon: <Calendar className="w-4 h-4" /> },
-              { label: 'Rentals', href: '/admin/rentals', icon: <KeyRound className="w-4 h-4" /> },
-              { label: 'Payments', href: '/admin/payments', icon: <CreditCard className="w-4 h-4" /> },
-              { label: 'Customer Reviews', href: '/admin/reviews', icon: <Star className="w-4 h-4" /> },
+              { label: 'Overview', href: '/admin', icon: <LayoutDashboard className="w-4 h-4" /> },
+              { label: 'Fleet Inventory', href: '/admin/vehicles', icon: <Car className="w-4 h-4" /> },
+              { label: 'Bookings Ledger', href: '/admin/bookings', icon: <Calendar className="w-4 h-4" /> },
+              { label: 'Active Rentals', href: '/admin/rentals', icon: <KeyRound className="w-4 h-4" /> },
+              { label: 'Transactions', href: '/admin/payments', icon: <CreditCard className="w-4 h-4" /> },
+            ],
+          },
+          {
+            title: 'Control & Users',
+            items: [
+              { label: 'Users Directory', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
+              { label: 'Feedback & Reviews', href: '/admin/reviews', icon: <Star className="w-4 h-4" /> },
               { label: 'System Alerts', href: '/admin/notifications', icon: <Bell className="w-4 h-4" /> },
             ],
           },
@@ -129,11 +114,12 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             title: 'Fleet Operations',
             items: [
               { label: 'Overview', href: '/fleet', icon: <LayoutDashboard className="w-4 h-4" /> },
-              { label: 'Fleet Inventory', href: '/fleet/vehicles', icon: <Car className="w-4 h-4" /> },
-              { label: 'Fleet Utilization', href: '/fleet/utilization', icon: <BarChart3 className="w-4 h-4" /> },
-              { label: 'Vehicle Health', href: '/fleet/health', icon: <ShieldCheck className="w-4 h-4" /> },
-              { label: 'Fleet Intelligence', href: '/fleet/intelligence', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
-              { label: 'Smart Allocation', href: '/fleet/allocation', icon: <Zap className="w-4 h-4 text-purple-400" /> },
+              { label: 'Fleet Vehicles', href: '/fleet/vehicles', icon: <Car className="w-4 h-4" /> },
+              { label: 'Utilization Stats', href: '/fleet/utilization', icon: <BarChart3 className="w-4 h-4" /> },
+              { label: 'Health Scores', href: '/fleet/health', icon: <ShieldCheck className="w-4 h-4" /> },
+              { label: 'Customer Feedback', href: '/fleet/reviews', icon: <Star className="w-4 h-4 text-[#C7F000]" /> },
+              { label: 'Intelligence Engine', href: '/fleet/intelligence', icon: <Sparkles className="w-4 h-4 text-[#C7F000]" /> },
+              { label: 'Smart Allocation', href: '/fleet/allocation', icon: <Zap className="w-4 h-4 text-[#7657FF]" /> },
               { label: 'Maintenance Impact', href: '/fleet/maintenance', icon: <Wrench className="w-4 h-4" /> },
             ],
           },
@@ -144,8 +130,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             title: 'Maintenance',
             items: [
               { label: 'Dashboard', href: '/maintenance', icon: <LayoutDashboard className="w-4 h-4" /> },
-              { label: 'Maintenance Tasks', href: '/maintenance/tasks', icon: <Wrench className="w-4 h-4" /> },
-              { label: 'Vehicle Status', href: '/maintenance/vehicles', icon: <Car className="w-4 h-4" /> },
+              { label: 'Task Queue', href: '/maintenance/tasks', icon: <Wrench className="w-4 h-4" /> },
+              { label: 'Vehicle Readiness', href: '/maintenance/vehicles', icon: <Car className="w-4 h-4" /> },
             ],
           },
         ];
@@ -154,121 +140,203 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     }
   };
 
-  const navGroups = getNavGroups();
+  const isCurrentActive = (itemHref: string, itemNumber?: string) => {
+    if (isCustomer && itemNumber) {
+      switch (itemNumber) {
+        case '01': // DISCOVER: /customer, /customer/vehicles, /customer/vehicles/[id]
+          return pathname === '/customer' || pathname.startsWith('/customer/vehicles');
+        case '02': // GARAGE: /customer/profile
+          return pathname.startsWith('/customer/profile');
+        case '03': // BOOKINGS: /customer/bookings, /customer/bookings/[id]
+          return pathname.startsWith('/customer/bookings');
+        case '04': // RIDES: /customer/rentals, /customer/rentals/[id], /customer/reviews
+          return pathname.startsWith('/customer/rentals') || pathname.startsWith('/customer/reviews');
+        case '05': // REWARDS: /customer/loyalty
+          return pathname.startsWith('/customer/loyalty');
+        default:
+          return false;
+      }
+    }
+
+    if (pathname === itemHref) return true;
+    if (itemHref !== '/customer' && itemHref !== '/admin' && itemHref !== '/fleet' && itemHref !== '/maintenance') {
+      return pathname.startsWith(itemHref);
+    }
+    return false;
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 flex flex-col antialiased selection:bg-blue-600 selection:text-white">
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-slate-900 border-b border-slate-800 text-white shadow-xs">
+    <div className="min-h-screen bg-[#F4F1EA] text-[#111111] flex flex-col font-sans selection:bg-[#C7F000] selection:text-[#111111]">
+      {/* Top Editorial Ticker Bar */}
+      <div className="bg-[#111111] text-[#F4F1EA] text-[10px] font-display uppercase tracking-[0.2em] py-1 px-4 border-b border-[#242422]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="inline-block w-1.5 h-1.5 bg-[#C7F000]" />
+            <span className="font-bold">VELORENT AUTOMOTIVE EDITORIAL</span>
+            <span className="hidden sm:inline text-[#777770]">/</span>
+            <span className="hidden sm:inline text-[#AAA8A0]">CURATED FLEET MARKETPLACE</span>
+          </div>
+          <div className="flex items-center gap-4 text-[#AAA8A0]">
+            <span className="hidden md:inline font-mono">EDITION 2026.09</span>
+            <span className="text-[#C7F000] font-bold">READY TO ROLL</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Editorial Header */}
+      <header className="sticky top-0 z-40 bg-[#111111] border-b border-[#222220] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          {/* Brand Identity */}
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="lg:hidden p-2 text-[#AAA8A0] hover:text-[#C7F000] focus:outline-none"
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm tracking-wider shadow-sm group-hover:bg-blue-500 transition-colors">
+
+            <Link href={isCustomer ? '/customer' : '/'} className="flex items-center gap-3 group">
+              <div className="w-8 h-8 bg-[#C7F000] text-[#111111] font-display font-black text-sm tracking-tighter flex items-center justify-center border border-[#111111] shadow-[2px_2px_0px_#7657FF] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-none transition-all">
                 VR
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-base tracking-tight text-white leading-tight">
-                  Velo<span className="text-blue-500">Rent</span>
+                <span className="font-display font-extrabold text-lg tracking-tight uppercase leading-none text-white">
+                  VELO<span className="text-[#C7F000]">RENT</span>
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase leading-none">
-                  Automotive Marketplace
+                <span className="text-[9px] font-display uppercase tracking-[0.25em] text-[#888880] mt-0.5">
+                  AUTOMOTIVE × GEN-Z
                 </span>
               </div>
             </Link>
           </div>
 
+          {/* Desktop Horizontal Navigation for Customer */}
+          {isCustomer && (
+            <nav className="hidden lg:flex items-center space-x-1">
+              {customerNavItems.map((item) => {
+                const active = isCurrentActive(item.href, item.number);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={clsx(
+                      'px-3.5 py-1.5 font-display text-xs font-bold uppercase tracking-wider transition-all duration-150 flex items-center gap-1.5',
+                      active
+                        ? 'bg-[#C7F000] text-[#111111] shadow-[2px_2px_0px_#000000]'
+                        : 'text-[#AAA8A0] hover:text-white hover:bg-[#222220]'
+                    )}
+                  >
+                    <span className={clsx('text-[10px] font-mono', active ? 'text-[#111111]/70' : 'text-[#666660]')}>
+                      {item.number}
+                    </span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+
+          {/* Right Action Icons & Profile */}
           <div className="flex items-center gap-3">
             {user && (
               <>
-                {/* Notification Icon Button with Badge */}
+                {/* Notifications Link */}
                 <Link
                   href="/customer/notifications"
-                  className="relative p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  className="relative p-2 text-[#AAA8A0] hover:text-white hover:bg-[#222220] transition-colors"
                   aria-label="Notifications"
                 >
                   <Bell className="w-5 h-5" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute top-1 right-1 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-blue-500 text-white leading-none shadow-xs">
+                    <span className="absolute top-1 right-1 px-1.5 py-0.2 font-display text-[9px] font-black bg-[#C7F000] text-[#111111] leading-none">
                       {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
                     </span>
                   )}
                 </Link>
 
-                {/* User Profile & Dropdown */}
+                {/* Driver Identity Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-slate-800 transition-colors focus:outline-none"
+                    className="flex items-center gap-2 p-1.5 hover:bg-[#222220] transition-colors focus:outline-none border border-[#2E2E2A]"
                     aria-expanded={isUserMenuOpen}
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center border border-blue-400/30">
+                    <div className="w-7 h-7 bg-[#242422] text-[#C7F000] font-display font-bold text-xs flex items-center justify-center border border-[#3E3E38]">
                       {getInitials(user.fullName)}
                     </div>
                     <div className="hidden sm:flex flex-col text-left">
-                      <span className="text-xs font-semibold text-white leading-tight">{user.fullName}</span>
-                      <span className="text-[10px] text-slate-400 leading-tight">{user.email}</span>
+                      <span className="text-xs font-display font-bold text-white uppercase tracking-wider leading-tight">
+                        {user.fullName}
+                      </span>
+                      <span className="text-[9px] font-mono text-[#888880] leading-none">
+                        {user.role}
+                      </span>
                     </div>
-                    <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-[#888880] hidden sm:block" />
                   </button>
 
                   {/* Dropdown Menu */}
                   {isUserMenuOpen && (
                     <div
-                      className="absolute right-0 mt-2 w-56 bg-white text-slate-900 rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute right-0 mt-2 w-64 bg-[#FFFFFF] text-[#111111] border-2 border-[#111111] shadow-[4px_4px_0px_#111111] py-2 z-50 animate-in fade-in zoom-in-95 duration-100"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="text-xs font-bold text-slate-900">{user.fullName}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
-                        <div className="mt-1">
+                      <div className="px-4 py-2.5 border-b border-[#111111]/10 bg-[#FAF8F5]">
+                        <span className="micro-tag text-[#888880]">DRIVER IDENTITY</span>
+                        <p className="font-display text-sm font-extrabold text-[#111111] uppercase tracking-tight mt-0.5">
+                          {user.fullName}
+                        </p>
+                        <p className="text-[11px] text-[#666660] font-mono truncate">{user.email}</p>
+                        <div className="mt-2">
                           <RoleBadge role={user.role} />
                         </div>
                       </div>
 
-                      <div className="py-1 text-xs font-medium text-slate-700">
-                        <Link href="/customer/profile" className="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 transition-colors">
-                          <UserIcon className="w-4 h-4 text-slate-500" />
-                          Profile
-                        </Link>
-                        <Link href="/customer/bookings" className="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 transition-colors">
-                          <Calendar className="w-4 h-4 text-slate-500" />
-                          My Bookings
-                        </Link>
-                        <Link href="/customer/rentals" className="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 transition-colors">
-                          <KeyRound className="w-4 h-4 text-slate-500" />
-                          My Rentals
-                        </Link>
-                        <Link href="/customer/loyalty" className="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 transition-colors">
-                          <Award className="w-4 h-4 text-amber-500" />
-                          Loyalty Rewards
-                        </Link>
-                        <Link href="/customer/notifications" className="flex items-center justify-between px-4 py-2 hover:bg-slate-50 transition-colors">
-                          <span className="flex items-center gap-2.5">
-                            <Bell className="w-4 h-4 text-slate-500" />
-                            Notifications
-                          </span>
-                          {unreadNotifCount > 0 && (
-                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
-                              {unreadNotifCount}
-                            </span>
-                          )}
-                        </Link>
+                      <div className="py-1 text-xs font-display font-semibold uppercase tracking-wider">
+                        {isCustomer && (
+                          <>
+                            <Link href="/customer/profile" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <UserIcon className="w-4 h-4 text-[#888880]" />
+                              01 / Driver Profile
+                            </Link>
+                            <Link href="/customer/rentals" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <KeyRound className="w-4 h-4 text-[#888880]" />
+                              02 / Your Garage
+                            </Link>
+                            <Link href="/customer/bookings" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <Calendar className="w-4 h-4 text-[#888880]" />
+                              03 / Bookings Ledger
+                            </Link>
+                            <Link href="/customer/payments" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <CreditCard className="w-4 h-4 text-[#888880]" />
+                              04 / Payment History
+                            </Link>
+                            <Link href="/customer/loyalty" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <Award className="w-4 h-4 text-[#7657FF]" />
+                              05 / Membership Pass
+                            </Link>
+                            <Link href="/customer/reviews" className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                              <Star className="w-4 h-4 text-[#888880]" />
+                              06 / Ride Reviews
+                            </Link>
+                          </>
+                        )}
+                        {!isCustomer && (
+                          <Link href={`/${user.role.toLowerCase().replace('_', '')}`} className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#C7F000] hover:text-[#111111] transition-colors">
+                            <LayoutDashboard className="w-4 h-4 text-[#888880]" />
+                            Dashboard
+                          </Link>
+                        )}
                       </div>
 
-                      <div className="pt-1 border-t border-slate-100">
+                      <div className="pt-2 border-t border-[#111111]/10">
                         <button
                           onClick={logout}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-display font-bold uppercase tracking-wider text-[#FF654A] hover:bg-[#FFF0ED] transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
-                          Logout
+                          Sign Out
                         </button>
                       </div>
                     </div>
@@ -280,186 +348,205 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </div>
       </header>
 
-      <div className="flex-1 max-w-7xl w-full mx-auto flex">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex flex-col justify-between w-64 shrink-0 border-r border-slate-200/80 bg-white min-h-[calc(100vh-4rem)] p-4">
-          <div className="space-y-6">
-            {navGroups.map((group, idx) => (
-              <div key={group.title || idx} className="space-y-1">
-                {group.title && (
-                  <h5 className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                    {group.title}
-                  </h5>
-                )}
-                <nav className="space-y-1">
-                  {group.items.map((item) => {
-                    const isActive =
-                      pathname === item.href ||
-                      (item.href !== '/customer' &&
-                        item.href !== '/admin' &&
-                        item.href !== '/fleet' &&
-                        item.href !== '/maintenance' &&
-                        pathname.startsWith(item.href));
+      {/* Mobile Drawer */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-[#111111]/80 backdrop-blur-xs flex">
+          <div className="w-80 bg-[#111111] text-white h-full p-6 flex flex-col justify-between border-r border-[#2E2E2A] overflow-y-auto">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-[#222220]">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 bg-[#C7F000] text-[#111111] font-display font-black text-xs flex items-center justify-center">
+                    VR
+                  </div>
+                  <span className="font-display font-bold text-sm tracking-tight text-white uppercase">
+                    VELORENT
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 text-[#AAA8A0] hover:text-white"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {isCustomer ? (
+                <nav className="space-y-2">
+                  <span className="micro-tag text-[#888880] block mb-2">INDEX</span>
+                  {customerNavItems.map((item) => {
+                    const active = isCurrentActive(item.href, item.number);
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
                         className={clsx(
-                          'flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-150',
-                          isActive
-                            ? 'bg-blue-600 text-white shadow-xs font-bold'
-                            : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+                          'flex items-center justify-between px-3 py-2.5 font-display text-sm font-bold uppercase tracking-wider transition-all',
+                          active
+                            ? 'bg-[#C7F000] text-[#111111]'
+                            : 'text-[#AAA8A0] hover:bg-[#222220] hover:text-white'
                         )}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <span className={clsx(isActive ? 'text-white' : 'text-slate-500')}>
-                            {item.icon}
-                          </span>
+                        <span className="flex items-center gap-2">
+                          <span className="text-xs font-mono opacity-60">{item.number}</span>
                           <span>{item.label}</span>
-                        </div>
-                        {item.badge !== undefined && item.badge > 0 && (
-                          <span
-                            className={clsx(
-                              'px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none',
-                              isActive ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-700'
-                            )}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
+                        </span>
+                        <ArrowRight className="w-4 h-4 opacity-50" />
                       </Link>
                     );
                   })}
+                  <div className="pt-4 border-t border-[#222220] space-y-1">
+                    <span className="micro-tag text-[#888880] block mb-2">ACCOUNT</span>
+                    <Link
+                      href="/customer/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-xs font-display font-semibold text-[#AAA8A0] hover:text-white uppercase"
+                    >
+                      Driver Profile
+                    </Link>
+                    <Link
+                      href="/customer/payments"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-xs font-display font-semibold text-[#AAA8A0] hover:text-white uppercase"
+                    >
+                      Payments Ledger
+                    </Link>
+                    <Link
+                      href="/customer/reviews"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-xs font-display font-semibold text-[#AAA8A0] hover:text-white uppercase"
+                    >
+                      Ride Reviews
+                    </Link>
+                    <Link
+                      href="/customer/notifications"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-xs font-display font-semibold text-[#AAA8A0] hover:text-white uppercase"
+                    >
+                      Notifications ({unreadNotifCount})
+                    </Link>
+                  </div>
                 </nav>
-              </div>
-            ))}
-          </div>
+              ) : (
+                <div className="space-y-4">
+                  {getAdminFleetNavGroups().map((group, idx) => (
+                    <div key={idx} className="space-y-1">
+                      {group.title && (
+                        <span className="micro-tag text-[#888880] block mb-1">
+                          {group.title}
+                        </span>
+                      )}
+                      {group.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={clsx(
+                            'flex items-center gap-2 px-3 py-2 text-xs font-display font-bold uppercase tracking-wider',
+                            isCurrentActive(item.href)
+                              ? 'bg-[#C7F000] text-[#111111]'
+                              : 'text-[#AAA8A0] hover:bg-[#222220] hover:text-white'
+                          )}
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* User Profile Card at Sidebar Bottom */}
-          {user && (
-            <div className="pt-4 border-t border-slate-100 mt-6">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+            {user && (
+              <div className="pt-4 border-t border-[#222220] space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-[#242422] text-[#C7F000] font-display font-bold text-xs flex items-center justify-center border border-[#3E3E38]">
                     {getInitials(user.fullName)}
                   </div>
                   <div className="truncate">
-                    <p className="text-xs font-bold text-slate-900 truncate leading-tight">{user.fullName}</p>
-                    <p className="text-[10px] text-slate-400 capitalize leading-tight">{user.role.toLowerCase().replace('_', ' ')}</p>
+                    <span className="text-xs font-display font-bold text-white block truncate uppercase">
+                      {user.fullName}
+                    </span>
+                    <span className="text-[10px] text-[#888880] font-mono block">{user.email}</span>
                   </div>
                 </div>
                 <button
                   onClick={logout}
-                  title="Logout"
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
-                  aria-label="Logout"
+                  className="w-full flex items-center justify-center gap-2 p-2 font-display text-xs font-bold uppercase tracking-wider text-[#FF654A] bg-[#FF654A]/10 border border-[#FF654A]/30 hover:bg-[#FF654A]/20 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
+                  Sign Out
                 </button>
               </div>
-            </div>
-          )}
-        </aside>
-
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex">
-            <div className="w-72 bg-white h-full p-4 flex flex-col justify-between shadow-2xl overflow-y-auto">
-              <div className="space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">
-                      VR
-                    </div>
-                    <span className="font-extrabold text-sm text-slate-900 tracking-tight">VeloRent</span>
-                  </div>
-                  <button
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
-                    aria-label="Close menu"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {navGroups.map((group, idx) => (
-                  <div key={group.title || idx} className="space-y-1">
-                    {group.title && (
-                      <h5 className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                        {group.title}
-                      </h5>
-                    )}
-                    <nav className="space-y-1">
-                      {group.items.map((item) => {
-                        const isActive =
-                          pathname === item.href ||
-                          (item.href !== '/customer' &&
-                            item.href !== '/admin' &&
-                            item.href !== '/fleet' &&
-                            item.href !== '/maintenance' &&
-                            pathname.startsWith(item.href));
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={clsx(
-                              'flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors',
-                              isActive
-                                ? 'bg-blue-600 text-white font-bold'
-                                : 'text-slate-700 hover:bg-slate-100'
-                            )}
-                          >
-                            <div className="flex items-center gap-2.5">
-                              {item.icon}
-                              <span>{item.label}</span>
-                            </div>
-                            {item.badge !== undefined && item.badge > 0 && (
-                              <span
-                                className={clsx(
-                                  'px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none',
-                                  isActive ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-700'
-                                )}
-                              >
-                                {item.badge}
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </nav>
-                  </div>
-                ))}
-              </div>
-
-              {user && (
-                <div className="pt-4 border-t border-slate-100 space-y-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
-                      {getInitials(user.fullName)}
-                    </div>
-                    <div className="truncate">
-                      <span className="text-xs font-bold text-slate-900 block truncate">{user.fullName}</span>
-                      <span className="text-[10px] text-slate-400 truncate block">{user.email}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={logout}
-                    className="w-full flex items-center justify-center gap-2 p-2 text-xs font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Main Container */}
+      <div className="flex-1 w-full max-w-7xl mx-auto flex">
+        {/* Left Sidebar ONLY for Admin / Fleet Manager / Maintenance Staff */}
+        {!isCustomer && (
+          <aside className="hidden lg:flex flex-col justify-between w-64 shrink-0 border-r border-[#E2DDD5] bg-[#FAF8F5] min-h-[calc(100vh-4rem)] p-4">
+            <div className="space-y-6">
+              {getAdminFleetNavGroups().map((group, idx) => (
+                <div key={idx} className="space-y-1">
+                  {group.title && (
+                    <span className="micro-tag text-[#888880] block px-3 mb-2">
+                      {group.title}
+                    </span>
+                  )}
+                  <nav className="space-y-1">
+                    {group.items.map((item) => {
+                      const active = isCurrentActive(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={clsx(
+                            'flex items-center gap-2.5 px-3 py-2 text-xs font-display font-bold uppercase tracking-wider transition-all',
+                            active
+                              ? 'bg-[#111111] text-[#C7F000] shadow-[2px_2px_0px_#C7F000]'
+                              : 'text-[#555550] hover:bg-[#ECE8E0] hover:text-[#111111]'
+                          )}
+                        >
+                          <span className={active ? 'text-[#C7F000]' : 'text-[#888880]'}>
+                            {item.icon}
+                          </span>
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
+              ))}
+            </div>
+          </aside>
         )}
 
-        {/* Main Content Area */}
+        {/* Primary Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">{children}</main>
       </div>
+
+      {/* Editorial Footer Strip */}
+      <footer className="mt-auto border-t border-[#E2DDD5] bg-[#FAF8F5] text-[#777770] py-6 px-4 text-xs font-mono">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="font-display font-bold text-[#111111] uppercase tracking-wider">VELORENT</span>
+            <span>/</span>
+            <span>AUTOMOTIVE EDITORIAL × FLEET ENGINE</span>
+          </div>
+          <div className="flex items-center gap-6 text-[11px] uppercase tracking-wider">
+            <span>DATABASE: MYSQL LIVE</span>
+            <span>•</span>
+            <span>INTELLIGENCE: ACTIVE</span>
+            <span>•</span>
+            <span className="text-[#111111] font-bold">ALL RIGHTS RESERVED 2026</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
-

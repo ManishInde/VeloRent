@@ -30,7 +30,7 @@ int ReviewService::submitReview(Review& review) {
     // 2. Business Rule: One review per completed rental (prevent duplicate review)
     try {
         reviewRepo.findByRental(review.getRentalId());
-        throw BusinessRuleException("A review has already been submitted for Rental ID " + std::to_string(review.getRentalId()) + ".");
+        throw BusinessRuleException("A review already exists for this rental.");
     } catch (const NotFoundException&) {
         // Expected: no existing review for this rental
     }
@@ -80,9 +80,17 @@ int ReviewService::submitReview(Review& review) {
     review.setVehicleId(authoritativeVehicleId);
 
     // 10. Persist review with foreign key integrity guaranteed
-    int id = reviewRepo.save(review);
-    Logger::info("ReviewService: Review submitted successfully with ID " + std::to_string(id));
-    return id;
+    try {
+        int id = reviewRepo.save(review);
+        Logger::info("ReviewService: Review submitted successfully with ID " + std::to_string(id));
+        return id;
+    } catch (const DatabaseException& ex) {
+        std::string msg = ex.what();
+        if (msg.find("Duplicate entry") != std::string::npos || msg.find("1062") != std::string::npos || msg.find("uq_review_rental") != std::string::npos) {
+            throw BusinessRuleException("A review already exists for this rental.");
+        }
+        throw;
+    }
 }
 
 Review ReviewService::getReviewById(int reviewId) {
@@ -99,6 +107,10 @@ std::vector<Review> ReviewService::getVehicleReviews(int vehicleId) {
 
 std::vector<Review> ReviewService::getCustomerReviews(int customerId) {
     return reviewRepo.findByCustomer(customerId);
+}
+
+std::vector<ReviewDetail> ReviewService::getAllReviewsDetailed(int vehicleId, int rating, const std::string& search) {
+    return reviewRepo.findAllDetailed(vehicleId, rating, search);
 }
 
 void ReviewService::validateReview(const Review& review) {

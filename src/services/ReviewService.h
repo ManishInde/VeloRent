@@ -26,6 +26,7 @@ public:
     Review getReviewByRental(int rentalId);
     std::vector<Review> getVehicleReviews(int vehicleId);
     std::vector<Review> getCustomerReviews(int customerId);
+    std::vector<ReviewDetail> getAllReviewsDetailed(int vehicleId = 0, int rating = 0, const std::string& search = "");
 
     void validateReview(const Review& review);
 };

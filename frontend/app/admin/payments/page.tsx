@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { PaymentStatusBadge } from '@/components/ui/StatusBadge';
 import { processPayment } from '@/lib/api/payments';
 import { Payment } from '@/types';
-import { CreditCard, Info, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CreditCard, Info, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export default function AdminPaymentsPage() {
   const [rentalId, setRentalId] = useState<string>('1');
@@ -21,6 +21,7 @@ export default function AdminPaymentsPage() {
   const [executedPayment, setExecutedPayment] = useState<Payment | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [settledNotice, setSettledNotice] = useState<{ rentalId: number; message: string } | null>(null);
 
   const handleProcessPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +45,22 @@ export default function AdminPaymentsPage() {
     try {
       const payment = await processPayment(rId, amt, method, paymentType);
       setExecutedPayment(payment);
+      setSettledNotice(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment processing failed.');
+      const msg = err instanceof Error ? err.message : 'Payment processing failed.';
+      const isAlreadyPaid =
+        msg.toLowerCase().includes('already been paid') ||
+        msg.toLowerCase().includes('duplicate payment');
+      if (isAlreadyPaid) {
+        setSettledNotice({
+          rentalId: rId,
+          message: `The base rental fee for Rental #${rId} has already been paid and settled. Duplicate payment attempts are blocked to safeguard transaction integrity.`,
+        });
+        setError(null);
+      } else {
+        setError(msg);
+        setSettledNotice(null);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -67,6 +82,18 @@ export default function AdminPaymentsPage() {
             VeloRent payment operations interact directly with the C++ simulated PaymentService. No credit cards, CVVs, or real financial gateways are connected.
           </div>
         </div>
+
+        {settledNotice && (
+          <div className="mb-6 p-4 bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs rounded-xl flex items-start gap-3 max-w-xl">
+            <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <strong className="block text-amber-950 font-bold uppercase">
+                RENTAL FEE ALREADY SETTLED
+              </strong>
+              <p className="text-amber-900 leading-relaxed">{settledNotice.message}</p>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2 max-w-xl">
@@ -91,7 +118,11 @@ export default function AdminPaymentsPage() {
                     type="number"
                     min={1}
                     value={rentalId}
-                    onChange={(e) => setRentalId(e.target.value)}
+                    onChange={(e) => {
+                      setRentalId(e.target.value);
+                      setSettledNotice(null);
+                      setError(null);
+                    }}
                     required
                   />
                   <Input
@@ -139,9 +170,12 @@ export default function AdminPaymentsPage() {
                     size="sm"
                     className="w-full"
                     isLoading={isProcessing}
+                    disabled={settledNotice?.rentalId === parseInt(rentalId, 10)}
                     leftIcon={<CheckCircle2 className="w-4 h-4" />}
                   >
-                    Confirm & Execute Payment
+                    {settledNotice?.rentalId === parseInt(rentalId, 10)
+                      ? 'Rental Fee Already Settled'
+                      : 'Confirm & Execute Payment'}
                   </Button>
                 </div>
               </form>

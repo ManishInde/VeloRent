@@ -150,11 +150,15 @@ void HttpServer::registerRoutes() {
 
     // 6. Payment Routes
     svr.Post("/api/payments", [this](const httplib::Request& req, httplib::Response& res) { paymentCtrl.processPayment(req, res); });
+    svr.Get(R"(/api/rentals/(\d+)/payments)", [this](const httplib::Request& req, httplib::Response& res) { paymentCtrl.getPaymentsByRental(req, res); });
+    svr.Get(R"(/api/customers/(\d+)/payments)", [this](const httplib::Request& req, httplib::Response& res) { paymentCtrl.getCustomerPayments(req, res); });
 
     // 7. Review Routes
     svr.Post("/api/reviews", [this](const httplib::Request& req, httplib::Response& res) { reviewCtrl.submitReview(req, res); });
+    svr.Get("/api/reviews", [this](const httplib::Request& req, httplib::Response& res) { reviewCtrl.getAllReviews(req, res); });
     svr.Get(R"(/api/vehicles/(\d+)/reviews)", [this](const httplib::Request& req, httplib::Response& res) { reviewCtrl.getVehicleReviews(req, res); });
     svr.Get(R"(/api/customers/(\d+)/reviews)", [this](const httplib::Request& req, httplib::Response& res) { reviewCtrl.getCustomerReviews(req, res); });
+    svr.Get(R"(/api/rentals/(\d+)/review)", [this](const httplib::Request& req, httplib::Response& res) { reviewCtrl.getRentalReview(req, res); });
 
     // 8. Maintenance Routes
     svr.Get("/api/maintenance", [this](const httplib::Request& req, httplib::Response& res) { maintenanceCtrl.getMaintenanceTasks(req, res); });

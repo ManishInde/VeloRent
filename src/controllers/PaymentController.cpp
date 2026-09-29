@@ -32,4 +32,35 @@ void PaymentController::processPayment(const httplib::Request& req, httplib::Res
     }
 }
 
+void PaymentController::getPaymentsByRental(const httplib::Request& req, httplib::Response& res) {
+    try {
+        AuthContext auth = authMiddleware.extractAuthContext(req);
+        AuthMiddleware::requireAuthenticated(auth);
+
+        int rentalId = std::stoi(req.matches[1]);
+        auto payments = paymentService.getPaymentsByRental(rentalId);
+        HttpResponse::collection(res, JsonUtils::toJson(payments));
+    } catch (...) {
+        throw;
+    }
+}
+
+void PaymentController::getCustomerPayments(const httplib::Request& req, httplib::Response& res) {
+    try {
+        AuthContext auth = authMiddleware.extractAuthContext(req);
+        AuthMiddleware::requireAuthenticated(auth);
+
+        int customerId = std::stoi(req.matches[1]);
+        if (auth.role == UserRole::CUSTOMER && auth.userId != customerId) {
+            HttpResponse::error(res, 403, "FORBIDDEN", "You can only view your own payment records.");
+            return;
+        }
+
+        auto payments = paymentService.getPaymentsByCustomer(customerId);
+        HttpResponse::collection(res, JsonUtils::toJson(payments));
+    } catch (...) {
+        throw;
+    }
+}
+
 } // namespace velorent
